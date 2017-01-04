@@ -1,15 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include "go.h"
 #include "dessine.h"
-
 
 /**
  * Mettre ici son code pour dessiner dans la fenetre
  * 1er affichage + redessine si resize
  */
 void draw_win()
-{
+{	
 	// vide la fenetre
 	clear_win();
 
@@ -25,7 +21,7 @@ void draw_win()
 			pixel(j,i);
 		}
 	}
-
+		
 	for(i=height_win()/2; i<height_win(); i+=4)
 	{
 		for(j=0; j<width_win(); j+=4)
@@ -35,14 +31,14 @@ void draw_win()
 			filled_rectangle(j,i,4,4);
 		}
 	}
-
+	
 	color(1,0,0);
 	for(j=0; j<width_win(); j+=20)
 		line(j,24, width_win()-j, height_win()-24);
 
 	color(11,1,1);
 	string(5,5,"Test Affichage chaine");
-
+	
 }
 
 
@@ -88,7 +84,7 @@ void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 		default:
 			break;
 	}
-
+	
 	if (c>' ' && c<'z')
 		printf("char: %c \n",c);
 
@@ -96,12 +92,10 @@ void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 
 }
 
-int main()
+
+int main() 
 {
-  printf("Début du programme de test du jeux de go \n");
-  printf("Test de l'interface graphique \n");
-  init_win(400,400, "Essai",0.2,0.2,0.6);
-  event_loop();
-  return EXIT_SUCCESS;
-  printf("Fin test de l'interface graphique \n");
+	init_win(400,400, "Essai",0.2,0.2,0.6);
+	event_loop();
+	return EXIT_SUCCESS;
 }
