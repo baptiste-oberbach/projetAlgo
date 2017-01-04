@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <string.h>
 #include <math.h>
 #include "go.h"
 #include "dessine.h"
 
-int taillePlateau = 9;
+
+int taillePlateau = 19;
 int * plateau;
 
 
@@ -131,8 +132,19 @@ void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 }
 
 //Lance le jeu
-void game()
+void game(int argc, char *argv[])
 {
+	int largeur = 700;
+	int hauteur = 700;
+	for(int i =1;i<argc;i+=2)
+	{
+		if(argv[i] == "-largeur")
+		{
+			printf("test \n");
+			printf("test :%d \n", atoi(argv[i+1]));
+		}
+		printf("argument %d : %s \n",i,argv[i]);
+	}
   init_win(700,700, "Essai",246,254,185);
   event_loop();
 }
