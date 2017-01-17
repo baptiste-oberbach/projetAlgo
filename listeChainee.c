@@ -227,31 +227,16 @@ void retire(Liste* l, Noeud* n)
 	}
 }
 
+//Merge la chaine1 avec la chaine2
 void mergeChaine(Pion* chaine1, Pion* chaine2);
 {
-/*
-node *p;
-                if (head1==NULL)                            //if the first linked
-list is empty
-                                return
-(head2);
-                if (head2==NULL)                            //if second linked
-list is empty
-                                return
-(head1);
-               
-                p=head1;                             //place p on the first
-node of the first linked list
-               
-                while (p->next!=NULL)                 //move p to the last node
-                                p=p->next;
-                p->next=head2;                           //address
-of the first node of the second linked list stored in the last node of the
-first linked list
-                
-                return
-(head1);
-*/
+	if(chaine1->first == NULL) //la premiere chaine est vide
+		return;
+	if(chaine2->first == NULL)
+		return;
+
+	chaine1->last->next = chaine2->first; //met a la suite pour lui enfiler l'autre chaine
+	chaine2->first->prev = chaine1->last;
 }
 
 /*
