@@ -33,7 +33,7 @@ typedef struct JeuDeGo {
  Couleur joueurCourant;
 }Jeu;
 
-void draw_win();
+void draw_win(void);
 void mouse_clicked(int bouton, int x, int y);
 void key_pressed(KeySym code, char c, int x_souris, int y_souris);
 // Initialise une structure jeu
@@ -43,6 +43,7 @@ Pion initPion(Couleur couleur);
 Coord initCoord(int x, int y);
 bool checkDegreLibertePion(Jeu jeu, Pion pion);
 void playMoove(Jeu jeu, Coord coord, Couleur couleur);
+bool isAuthorizedMoove(Jeu jeu, Coord futurMoove);
 void game(int argc, char *argv[]);
 
 #endif /* go_h */

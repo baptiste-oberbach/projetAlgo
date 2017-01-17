@@ -22,22 +22,22 @@ void init_win(int w, int h, char* titre, float r, float g, float b);
 /**
  * boucle evenementielle
  */
-void event_loop();
+void event_loop(void);
 
 /**
  * vide fenetre
  */
-void clear_win();
+void clear_win(void);
 
 /**
  * largeur fenetre
  */
-int width_win();
+int width_win(void);
 
 /**
  * hauteur fenetre
  */
-int height_win();
+int height_win(void);
 
 /**
  *  change couleur de trace en RVB

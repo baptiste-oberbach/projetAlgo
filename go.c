@@ -118,18 +118,21 @@ void mouse_clicked(int bouton, int x, int y)
 		printf("largeur :%d hauteur :%d \n",posX,posY);
 		Coord coord = initCoord(posX,posY);
 
-
-		playMoove(jeu,coord,jeu.joueurCourant);
-		if(jeu.joueurCourant == BLANC)
+		if(isAuthorizedMoove(jeu, coord))
 		{
-			jeu.lastCoordBlanc = coord;
-			jeu.joueurCourant = NOIR;
+			playMoove(jeu,coord,jeu.joueurCourant);
+			if(jeu.joueurCourant == BLANC)
+			{
+				jeu.lastCoordBlanc = coord;
+				jeu.joueurCourant = NOIR;
+			}
+			else
+			{
+				jeu.lastCoordNoir = coord;
+				jeu.joueurCourant = BLANC;
+			}
 		}
-		else
-		{
-			jeu.lastCoordNoir = coord;
-			jeu.joueurCourant = BLANC;
-		}
+		
 		draw_win();
 		/*
 		color( 0.0,0.0,0.0);
@@ -264,6 +267,33 @@ bool checkDegreLibertePion(Jeu jeu, Pion pion)
 	return true;
 }
 
+//check si cest un mouvement autorisé 
+bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
+{
+	//check si la case n'est deja occupé par un autre pion
+	if (jeu.plateau[futurMoove.y*jeu.taille + futurMoove.x].couleur == VIDE)
+	{
+		//check le cas de répétition
+		if(jeu.joueurCourant == NOIR)
+		{
+			if(futurMoove.y == jeu.lastCoordBlanc.y && futurMoove.x == jeu.lastCoordBlanc.x)
+				return false;	
+
+		}
+		else //c'est le joueur blanc
+		{
+			if(futurMoove.y == jeu.lastCoordNoir.y && futurMoove.x == jeu.lastCoordNoir.x)
+				return false;
+		}
+		return true;
+	}
+	else
+	{
+		//deja un pion sur cette case, pas le droit de faire ca
+		return false;
+	}
+}
+
 void playMoove(Jeu jeu, Coord coord, Couleur couleur)
 {
 	//TODO Check if moove is allowed
@@ -291,7 +321,7 @@ void game(int argc, char *argv[])
 			hauteur = atoi(argv[i+1]);
 		}
 	}
-	init_win(largeur,hauteur, "Essai",246,254,185);
+	init_win(largeur,hauteur, "Jeu de GO",246,254,185);
 	jeu = initJeu(taillePlateau);
   	event_loop();
 }

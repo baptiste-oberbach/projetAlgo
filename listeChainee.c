@@ -228,7 +228,7 @@ void retire(Liste* l, Noeud* n)
 }
 
 //Merge la chaine1 avec la chaine2
-void mergeChaine(Pion* chaine1, Pion* chaine2);
+void mergeChaine(Liste* chaine1, Liste* chaine2)
 {
 	if(chaine1->first == NULL) //la premiere chaine est vide
 		return;

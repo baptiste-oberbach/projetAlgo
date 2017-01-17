@@ -51,7 +51,7 @@ Noeud* insert_after(Liste* l, Noeud* c, Pion pion);
 
 void retire(Liste* l, Noeud* n);
 
-void mergeChaine(Pion* chaine1, Pion* chaine2);
+void mergeChaine(Liste* chaine1, Liste* chaine2);
 
 //void apply(Liste* l, void (*fonct)(int*));
 

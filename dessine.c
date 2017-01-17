@@ -11,10 +11,9 @@ int     screen;
 Window  win, root;
 
 
-extern void draw_win();
+extern void draw_win(void);
 extern void mouse_clicked(int bouton, int x, int y);
 extern void key_pressed(KeySym code, char c, int x_souris, int y_souris);
-
 
 int width_win()
 {
