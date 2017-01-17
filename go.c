@@ -148,8 +148,8 @@ void game(int argc, char *argv[])
 		{
 			hauteur = atoi(argv[i+1]);
 		}
-
 	}
   init_win(largeur,hauteur, "Essai",246,254,185);
+	int * tableauJeu = malloc(sizeof(int)*taillePlateau*taillePlateau);
   event_loop();
 }
