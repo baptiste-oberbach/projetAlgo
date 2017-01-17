@@ -19,24 +19,25 @@ void draw_win()
 {
 	// vide la fenetre
 	clear_win();
-  // Calcul des unités
-  int uniteHauteur = height_win()/(taillePlateau+1);
-  int uniteLargeur = width_win()/(taillePlateau+1);
+	// Calcul des unités
+	int uniteHauteur = height_win()/(taillePlateau+1);
+	int uniteLargeur = width_win()/(taillePlateau+1);
 
 	int i,j;
-  //Choix de la couleur noir
-  color(0.0,0.0,0.0);
-  //traçage des lignes
+	//Choix de la couleur noir
+	color(0.0,0.0,0.0);
+	//traçage des lignes
 	for(i=0; i<taillePlateau; i++)
 	{
-    line(uniteLargeur,(i+1)*uniteHauteur,width_win()-uniteLargeur,(i+1)*uniteHauteur);
+    	line(uniteLargeur,(i+1)*uniteHauteur,width_win()-uniteLargeur,(i+1)*uniteHauteur);
 	}
-  //traçage des colonnes
-  for(j=0; j<taillePlateau; j++)
-  {
-    line((j+1)*uniteLargeur,uniteHauteur,(j+1)*uniteLargeur,height_win()-uniteHauteur);
-  }
-  //traçage des hoshis
+	//traçage des colonnes
+	for(j=0; j<taillePlateau; j++)
+	{
+		line((j+1)*uniteLargeur,uniteHauteur,(j+1)*uniteLargeur,height_win()-uniteHauteur);
+	}
+
+  	//traçage des hoshis
 	switch(taillePlateau)
 	{
 		case 19:
@@ -82,7 +83,7 @@ void draw_win()
 				}
 				else
 				{
-						color(0.0,0.0,0.0);
+					color(0.0,0.0,0.0);
 				}
 				filled_circle((j+1)*uniteHauteur,(i+1)*uniteLargeur,10);
 			}
@@ -214,7 +215,7 @@ Jeu initJeu(int taille)
 	Jeu jeu;
 	jeu.plateau = plateau;
 	jeu.lastCoordBlanc = initCoord(-2,-2);
-	jeu.lastCoordBlanc = initCoord(-2,-2);
+	jeu.lastCoordNoir = initCoord(-2,-2);
 	jeu.taille = taille;
 	jeu.joueurCourant = NOIR;
 	return jeu;
@@ -225,7 +226,6 @@ Pion initPion(Couleur couleur)
 {
 	Pion pion;
 	pion.couleur = couleur;
-		printf("test \n");
 	return pion;
 }
 
@@ -291,7 +291,7 @@ void game(int argc, char *argv[])
 			hauteur = atoi(argv[i+1]);
 		}
 	}
-  init_win(largeur,hauteur, "Essai",246,254,185);
+	init_win(largeur,hauteur, "Essai",246,254,185);
 	jeu = initJeu(taillePlateau);
-  event_loop();
+  	event_loop();
 }

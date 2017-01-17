@@ -1,4 +1,6 @@
 // A COMPILER avce -lX11
+#ifndef dessine_h
+#define dessine_h
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -93,4 +95,4 @@ void pixel(int x, int y);
  */
 void string(int x, int y, char* chaine);
 
-
+#endif /* dessine_h */

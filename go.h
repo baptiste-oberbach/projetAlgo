@@ -17,15 +17,13 @@ enum Couleur
 typedef struct Coordonnees {
  int x;
  int y;
-}
-Coord;
+}Coord;
 
 typedef struct PionDuPlateau {
  Couleur couleur;
- struct PionDuPlateau * chaineLie;
+ struct PionDuPlateau* chaineLie;
  Coord coord;
-}
-Pion;
+}Pion;
 
 typedef struct JeuDeGo {
  Coord lastCoordBlanc;
@@ -33,8 +31,7 @@ typedef struct JeuDeGo {
  Pion * plateau;
  int taille;
  Couleur joueurCourant;
-}
-Jeu;
+}Jeu;
 
 void draw_win();
 void mouse_clicked(int bouton, int x, int y);
