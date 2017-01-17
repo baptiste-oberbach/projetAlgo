@@ -42,7 +42,7 @@ void draw_win()
 			for(i=3; i<taillePlateau; i+=6)
 			{
 				for(j=3; j<taillePlateau; j+=6)
-					filled_circle((i+1)*uniteHauteur,(j+1)*uniteLargeur,5);
+					filled_circle((i+1)*uniteLargeur,(j+1)*uniteHauteur,5);
 			}
 			break;
 		case 13:
@@ -138,13 +138,18 @@ void game(int argc, char *argv[])
 	int hauteur = 700;
 	for(int i =1;i<argc;i+=2)
 	{
-		if(argv[i] == "-largeur")
+		// Si l'argument est -largeur
+		if(strcmp(argv[i],"-largeur") == 0)
 		{
-			printf("test \n");
-			printf("test :%d \n", atoi(argv[i+1]));
+			largeur = atoi(argv[i+1]);
 		}
-		printf("argument %d : %s \n",i,argv[i]);
+		// Si l'argument est -largeur
+		if(strcmp(argv[i],"-hauteur") == 0)
+		{
+			hauteur = atoi(argv[i+1]);
+		}
+
 	}
-  init_win(700,700, "Essai",246,254,185);
+  init_win(largeur,hauteur, "Essai",246,254,185);
   event_loop();
 }
