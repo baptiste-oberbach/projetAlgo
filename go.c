@@ -7,7 +7,7 @@
 
 
 int taillePlateau = 19;
-int * plateau;
+Jeu jeu;
 
 
 /**
@@ -63,6 +63,28 @@ void draw_win()
 			//hoshi central
 			filled_circle(5*uniteHauteur,5*uniteLargeur,5);
 			break;
+	}
+
+	//Pour chaque croisement
+	for(int i = 0;i < taillePlateau; i++)
+	{
+		for(int j = 0; j < taillePlateau; j++)
+		{
+			//Si il existe un pion sur ce croisement
+			if(jeu.plateau[i*taillePlateau+j].couleur != VIDE)
+			{
+				//Choix de la couleur
+				if(jeu.plateau[i*taillePlateau+j].couleur == BLANC)
+				{
+					color(1.0,1.0,1.0);
+				}
+				else
+				{
+						color(0.0,0.0,0.0);
+				}
+				filled_circle((i+1)*uniteLargeur,(j+1)*uniteHauteur,10);
+			}
+		}
 	}
 }
 
@@ -130,6 +152,41 @@ void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 	printf(" avec pos souris: %d,%d \n",x_souris,y_souris);
 
 }
+// Initialise une structure jeu
+Jeu initJeu(int taille)
+{
+	Pion * plateau= malloc(sizeof(Pion*)* taille * taille);
+	//Initialise le plateau pour chaque croisement
+	for(int i = 0;i < taille; i++)
+	{
+		for(int j = 0; j < taille; j++)
+		{
+			plateau[i*taille+j]=initPion(VIDE);
+		}
+	}
+	Jeu jeu;
+	jeu.plateau = plateau;
+	jeu.lastCoordBlanc = NULL;
+	jeu.lastCoordBlanc = NULL;
+	return jeu;
+}
+
+//Initialise un Pion
+Pion initPion(Couleur couleur)
+{
+	Pion pion;
+	pion.couleur = couleur;
+		printf("test \n");
+	return pion;
+}
+
+Coord initCoord(int x, int y)
+{
+	Coord coord;
+	coord.x = x;
+	coord.y = y;
+	return coord;
+}
 
 //Lance le jeu
 void game(int argc, char *argv[])
@@ -150,6 +207,7 @@ void game(int argc, char *argv[])
 		}
 	}
   init_win(largeur,hauteur, "Essai",246,254,185);
-	int * tableauJeu = malloc(sizeof(int)*taillePlateau*taillePlateau);
+	jeu = initJeu(taillePlateau);
+	printf("test \n");
   event_loop();
 }
