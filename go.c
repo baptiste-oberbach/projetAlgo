@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
 #include "go.h"
 #include "dessine.h"
 
@@ -65,6 +66,7 @@ void draw_win()
 			break;
 	}
 
+	//Dessin des pions
 	//Pour chaque croisement
 	for(int i = 0;i < taillePlateau; i++)
 	{
@@ -82,7 +84,7 @@ void draw_win()
 				{
 						color(0.0,0.0,0.0);
 				}
-				filled_circle((i+1)*uniteLargeur,(j+1)*uniteHauteur,10);
+				filled_circle((j+1)*uniteHauteur,(i+1)*uniteLargeur,10);
 			}
 		}
 	}
@@ -97,22 +99,67 @@ void draw_win()
 void mouse_clicked(int bouton, int x, int y)
 {
 	printf("Bouton %d presse au coord. %d,%d \n",bouton,x,y);
+	//Si clique gauche
+	if(bouton == 1)
+	{
+		double uniteHauteur = height_win()/(taillePlateau+1);
+		double uniteLargeur = width_win()/(taillePlateau+1);
 
-  double uniteHauteur = height_win()/(taillePlateau+1);
-  double uniteLargeur = width_win()/(taillePlateau+1);
+		double dX = x/uniteLargeur;
+		double dY = y/uniteHauteur;
+		// Calcul de la position dans le plateau
+		int posX = floor(dX+0.5)-1;
+		int posY = floor(dY+0.5)-1;
+		// Cas des bords du tableau
+		posX = posX<0 ? 0 :posX;
+		posY = posY<0 ? 0 :posY;
 
-  double dX = x/uniteLargeur;
-	double dY = y/uniteHauteur;
-	// Calcul de la position dans le plateau
-	int posX = floor(dX+0.5)-1;
-	int posY = floor(dY+0.5)-1;
-	// Cas des bords du tableau
-	posX = posX<0 ? 0 :posX;
-	posY = posY<0 ? 0 :posY;
+		printf("largeur :%d hauteur :%d \n",posX,posY);
+		Coord coord = initCoord(posX,posY);
 
-  printf("largeur :%d hauteur :%d \n",posX,posY);
-	color( 0.0,0.0,0.0);
-	filled_circle((posX+1)*uniteLargeur,(posY+1)*uniteHauteur,10);
+
+		playMoove(jeu,coord,jeu.joueurCourant);
+		if(jeu.joueurCourant == BLANC)
+		{
+			jeu.lastCoordBlanc = coord;
+			jeu.joueurCourant = NOIR;
+		}
+		else
+		{
+			jeu.lastCoordNoir = coord;
+			jeu.joueurCourant = BLANC;
+		}
+		draw_win();
+		/*
+		color( 0.0,0.0,0.0);
+		filled_circle((posX+1)*uniteLargeur,(posY+1)*uniteHauteur,10);
+		*/
+	}
+	//Si clique droit
+	if(bouton == 3)
+	{
+		// Si les deux joueurs ont passé l'un après l'autre
+		if((jeu.joueurCourant == BLANC && jeu.lastCoordNoir.x == -1) || (jeu.joueurCourant == NOIR && jeu.lastCoordBlanc.x == -1))
+		{
+			printf("Deux passage consécutif, fin du jeux \n");
+		}
+		else
+		{
+			//Le joueur Blanc passe
+			if(jeu.joueurCourant == BLANC)
+			{
+				jeu.joueurCourant = NOIR;
+				jeu.lastCoordBlanc = initCoord(-1,-1);
+			}
+			//Le joueur Noir passe
+			else
+			{
+				jeu.joueurCourant = BLANC;
+				jeu.lastCoordNoir = initCoord(-1,-1);
+			}
+		}
+	}
+
 }
 
 
@@ -166,8 +213,10 @@ Jeu initJeu(int taille)
 	}
 	Jeu jeu;
 	jeu.plateau = plateau;
-	jeu.lastCoordBlanc = NULL;
-	jeu.lastCoordBlanc = NULL;
+	jeu.lastCoordBlanc = initCoord(-2,-2);
+	jeu.lastCoordBlanc = initCoord(-2,-2);
+	jeu.taille = taille;
+	jeu.joueurCourant = NOIR;
 	return jeu;
 }
 
@@ -186,6 +235,42 @@ Coord initCoord(int x, int y)
 	coord.x = x;
 	coord.y = y;
 	return coord;
+}
+
+
+
+bool checkDegreLibertePion(Jeu jeu, Pion pion)
+{
+	//Check la case au dessus
+	if(pion.coord.y != 0 && jeu.plateau[pion.coord.y-1*jeu.taille + pion.coord.x].couleur != VIDE)
+	{
+		return false;
+	}
+	//Check la case en dessus
+	if(pion.coord.y != jeu.taille-1 &&  jeu.plateau[pion.coord.y+1*jeu.taille + pion.coord.x].couleur != VIDE)
+	{
+		return false;
+	}
+	//Check la case à droite
+	if(pion.coord.x != jeu.taille-1 &&  jeu.plateau[pion.coord.x-1 + pion.coord.y*jeu.taille].couleur != VIDE)
+	{
+		return false;
+	}
+	//Check la case à gauche
+	if(pion.coord.x != 0 &&  jeu.plateau[pion.coord.x+1 + pion.coord.y*jeu.taille].couleur != VIDE)
+	{
+		return false;
+	}
+	return true;
+}
+
+void playMoove(Jeu jeu, Coord coord, Couleur couleur)
+{
+	//TODO Check if moove is allowed
+
+	Pion pion = initPion(couleur);
+	pion.coord = coord;
+	jeu.plateau[coord.x + coord.y * jeu.taille] = pion;
 }
 
 //Lance le jeu
@@ -208,6 +293,5 @@ void game(int argc, char *argv[])
 	}
   init_win(largeur,hauteur, "Essai",246,254,185);
 	jeu = initJeu(taillePlateau);
-	printf("test \n");
   event_loop();
 }
