@@ -343,6 +343,11 @@ void playMoove(Jeu jeu, Coord coord, Couleur couleur)
 	Pion pion = initPion(couleur);
 	pion.coord = coord;
 	jeu.plateau[coord.x + coord.y * jeu.taille] = pion;
+
+	//crée ca propre chaine
+	Liste* selfChaine = liste_vide();
+	push_front(selfChaine, pion); //met le pion dedans
+	pion.chaineLie = selfChaine;
 }
 
 void enleverPion(Jeu jeu, Pion pion)
