@@ -26,6 +26,8 @@ void playMoove(Jeu jeu, Coord coord, Couleur couleur);
 //Verifie si un coup est authorisé
 bool isAuthorizedMoove(Jeu jeu, Coord futurMoove);
 void enleverPion(Jeu jeu, Pion * pion);
+
+void fusionneChaineVoisine(Liste* chaine);
 //Lance le jeux
 void game(int argc, char *argv[]);
 

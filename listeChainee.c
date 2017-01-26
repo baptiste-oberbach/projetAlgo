@@ -1,263 +1,433 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
+#include <string.h>
+#include <math.h>
+#include <stdbool.h>
+#include "go.h"
 #include "listeChainee.h"
+#include "dessine.h"
 
 
-//Cree un noeud
-Noeud* nouveau_noeud(Pion * pion)
+
+int taillePlateau = 19;
+Jeu jeu;
+
+
+/**
+ * Mettre ici son code pour dessiner dans la fenetre
+ * 1er affichage + redessine si resize
+ */
+void draw_win()
 {
-	Noeud* n = malloc(sizeof(Noeud));
-	n->pion = pion;
-	n->next = NULL;
-	n->prev = NULL;
-	return n;
-}
+	// vide la fenetre
+	clear_win();
+	// Calcul des unités
+	int uniteHauteur = height_win()/(taillePlateau+1);
+	int uniteLargeur = width_win()/(taillePlateau+1);
 
-//Genere une liste vide
-Liste* liste_vide(void)
-{
-	Liste* l = malloc(sizeof(Liste));
-	l->nb = 0;
-	l->first = NULL;
-	l->last = NULL;
-	return l;
-}
-
-//Detruit toute la liste petit a petit
-void clear(Liste* l)
-{
-	while (l->nb != 0)
-		pop_front(l);
-	free(l);
-}
-
-//Ajout d'un element en tete de la liste
-Noeud* push_front(Liste* l, Pion * pion)
-{
-	Noeud* n = nouveau_noeud(pion);
-	if (l->first == NULL)
+	int i,j;
+	//Choix de la couleur noir
+	color(0.0,0.0,0.0);
+	//traçage des lignes
+	for(i=0; i<taillePlateau; i++)
 	{
-		l->first = n;
-		l->last = n;
+    	line(uniteLargeur,(i+1)*uniteHauteur,width_win()-uniteLargeur,(i+1)*uniteHauteur);
+	}
+	//traçage des colonnes
+	for(j=0; j<taillePlateau; j++)
+	{
+		line((j+1)*uniteLargeur,uniteHauteur,(j+1)*uniteLargeur,height_win()-uniteHauteur);
+	}
+
+  	//traçage des hoshis
+	switch(taillePlateau)
+	{
+		case 19:
+			for(i=3; i<taillePlateau; i+=6)
+			{
+				for(j=3; j<taillePlateau; j+=6)
+					filled_circle((i+1)*uniteLargeur,(j+1)*uniteHauteur,5);
+			}
+			break;
+		case 13:
+			for(i=3; i<taillePlateau; i+=6)
+			{
+				for(j=3; j<taillePlateau; j+=6)
+					filled_circle((i+1)*uniteHauteur,(j+1)*uniteLargeur,5);
+			}
+			//hoshi central
+			filled_circle(7*uniteHauteur,7*uniteLargeur,5);
+			break;
+		case 9:
+			for(i=2; i<taillePlateau; i+=4)
+			{
+				for(j=2; j<taillePlateau; j+=4)
+					filled_circle((i+1)*uniteHauteur,(j+1)*uniteLargeur,5);
+			}
+			//hoshi central
+			filled_circle(5*uniteHauteur,5*uniteLargeur,5);
+			break;
+	}
+
+	//Dessin des pions
+	//Pour chaque croisement
+	for(int i = 0;i < taillePlateau; i++)
+	{
+		for(int j = 0; j < taillePlateau; j++)
+		{
+			//Si il existe un pion sur ce croisement
+			if(jeu.plateau[i*taillePlateau+j]->couleur != VIDE)
+			{
+				//Choix de la couleur
+				if(jeu.plateau[i*taillePlateau+j]->couleur == BLANC)
+				{
+					color(1.0,1.0,1.0);
+				}
+				else
+				{
+					color(0.0,0.0,0.0);
+				}
+				filled_circle((j+1)*uniteHauteur,(i+1)*uniteLargeur,10);
+			}
+		}
+	}
+}
+
+
+/**
+ * on a cliqué a la souris:
+ * bouton: 1,2,3,4,5,... : gauche, milieu, droit, molette, ...
+ * x,y position
+ */
+void mouse_clicked(int bouton, int x, int y)
+{
+	printf("Bouton %d presse au coord. %d,%d \n",bouton,x,y);
+	//Si clique gauche
+	if(bouton == 1)
+	{
+		double uniteHauteur = height_win()/(taillePlateau+1);
+		double uniteLargeur = width_win()/(taillePlateau+1);
+
+		double dX = x/uniteLargeur;
+		double dY = y/uniteHauteur;
+		// Calcul de la position dans le plateau
+		int posX = floor(dX+0.5)-1;
+		int posY = floor(dY+0.5)-1;
+		// Cas des bords du tableau
+		posX = posX<0 ? 0 :posX;
+		posY = posY<0 ? 0 :posY;
+
+		printf("largeur :%d hauteur :%d \n",posX,posY);
+		Coord coord = initCoord(posX,posY);
+
+		if(isAuthorizedMoove(jeu, coord))
+		{
+			playMoove(jeu,coord,jeu.joueurCourant);
+			if(jeu.joueurCourant == BLANC)
+			{
+				jeu.lastCoordBlanc = coord;
+				jeu.joueurCourant = NOIR;
+			}
+			else
+			{
+				jeu.lastCoordNoir = coord;
+				jeu.joueurCourant = BLANC;
+			}
+		}
+		draw_win();
+	}
+	//Si clique droit
+	if(bouton == 3)
+	{
+		// Si les deux joueurs ont passé l'un après l'autre
+		if((jeu.joueurCourant == BLANC && jeu.lastCoordNoir.x == -1) || (jeu.joueurCourant == NOIR && jeu.lastCoordBlanc.x == -1))
+		{
+			printf("Deux passage consécutif, fin du jeux \n");
+		}
+		else
+		{
+			//Le joueur Blanc passe
+			if(jeu.joueurCourant == BLANC)
+			{
+				jeu.joueurCourant = NOIR;
+				jeu.lastCoordBlanc = initCoord(-1,-1);
+			}
+			//Le joueur Noir passe
+			else
+			{
+				jeu.joueurCourant = BLANC;
+				jeu.lastCoordNoir = initCoord(-1,-1);
+			}
+		}
+	}
+
+}
+
+
+/**
+ * on a appuyé sur une touche
+ * code: code touche x11 (XK_...)
+ * c caractère correspondant si caractere
+ * x_souris,y_souris position de la souris
+ */
+void key_pressed(KeySym code, char c, int x_souris, int y_souris)
+{
+	switch(code)
+	{
+		case XK_Down:
+			printf("bas\n");
+			break;
+		case XK_Up:
+			printf("haut\n");
+			break;
+		case XK_Left:
+			printf("gauche\n");
+			break;
+		case XK_Right:
+			printf("droite\n");
+			break;
+	//~ case XK_Return:
+	//~ case XK_Shift_L:
+	//~ case XK_Control_R:
+	//~ ....
+		default:
+			break;
+	}
+
+	if (c>' ' && c<'z')
+		printf("char: %c \n",c);
+
+	printf(" avec pos souris: %d,%d \n",x_souris,y_souris);
+
+}
+// Initialise une structure jeu
+Jeu initJeu(int taille)
+{
+	Pion ** plateau= malloc(sizeof(Pion*)* taille * taille);
+	//Initialise le plateau pour chaque croisement
+	for(int i = 0;i < taille; i++)
+	{
+		for(int j = 0; j < taille; j++)
+		{
+			Pion * pion = initPion(VIDE);
+			pion->coord = initCoord(j,i);
+			plateau[i*taille+j] = pion;
+		}
+	}
+	Jeu jeu;
+	jeu.plateau = plateau;
+	jeu.lastCoordBlanc = initCoord(-2,-2);
+	jeu.lastCoordNoir = initCoord(-2,-2);
+	jeu.taille = taille;
+	jeu.joueurCourant = NOIR;
+	return jeu;
+}
+
+//Initialise un Pion
+Pion * initPion(Couleur couleur)
+{
+	Pion * pion = malloc(sizeof(Pion));
+	pion->couleur = couleur;
+	return pion;
+}
+
+Coord initCoord(int x, int y)
+{
+	Coord coord;
+	coord.x = x;
+	coord.y = y;
+	return coord;
+}
+
+int nbDegreLibertePion(Jeu jeu, Pion pion)
+{
+	int res = 4;
+	//Check la case au dessus
+	if(pion.coord.y == 0 && jeu.plateau[pion.coord.y-1*jeu.taille + pion.coord.x]->couleur != VIDE)
+	{
+		res--;
+	}
+	//Check la case en dessus
+	if(pion.coord.y == jeu.taille-1 ||  jeu.plateau[pion.coord.y+1*jeu.taille + pion.coord.x]->couleur != VIDE)
+	{
+		res--;
+	}
+	//Check la case à droite
+	if(pion.coord.x == jeu.taille-1 ||  jeu.plateau[pion.coord.x-1 + pion.coord.y*jeu.taille]->couleur != VIDE)
+	{
+		res--;
+	}
+	//Check la case à gauche
+	if(pion.coord.x == 0 &&  jeu.plateau[pion.coord.x+1 + pion.coord.y*jeu.taille]->couleur != VIDE)
+	{
+		res--;
+	}
+	return res;
+}
+
+int nbDegreLiberteChaine(Jeu jeu,Liste liste)
+{
+	int res = 0;
+	Noeud * noeud = liste.first;
+	do
+	{
+		res += nbDegreLibertePion(jeu,*noeud->pion);
+	}
+	while(noeud != liste.last);
+	return res;
+}
+
+//check si cest un mouvement autorisé
+bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
+{
+	//Verif des repétition et de la case déjà occupé
+	//check si la case n'est deja occupé par un autre pion
+	if (jeu.plateau[futurMoove.y*jeu.taille + futurMoove.x]->couleur == VIDE)
+	{
+		//check le cas de répétition
+		if(jeu.joueurCourant == NOIR)
+		{
+			if(futurMoove.y == jeu.lastCoordBlanc.y && futurMoove.x == jeu.lastCoordBlanc.x)
+				return false;
+
+		}
+		else //c'est le joueur blanc
+		{
+			if(futurMoove.y == jeu.lastCoordNoir.y && futurMoove.x == jeu.lastCoordNoir.x)
+				return false;
+		}
 	}
 	else
 	{
-		n->next = l->first;
-		n->next->prev = n;
-		l->first = n;
+		//deja un pion sur cette case, pas le droit de faire ca
+		return false;
 	}
-	l->nb++;
-	return n;
-}
 
-//Retire l'element en tete
-void pop_front(Liste* l)
-{
-	Noeud* f = l->first;
-
-	if (f == NULL)
-		return;
-
-	if (f == l->last) //(or nb==1)
+	Pion  * adjacentPion;
+	//cas d'une cases adjacente vide et n'étant pas le bord => on peux placer le pion
+	//check la case au dessus
+	if(futurMoove.y != 0)
 	{
-		l->first = NULL;
-		l->last = NULL;
+		adjacentPion = jeu.plateau[(futurMoove.y-1)*jeu.taille + futurMoove.x];
+		//Si la case est vide on peux jouer
+		if(adjacentPion->couleur == VIDE)
+		{
+			return true;
+		}
+		else if(adjacentPion->couleur == jeu.joueurCourant)
+		{
+			//Check si chaine à coté à un degré de liberté > 1
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
+			printf("la chaine au dessus à %d degré de liberté", nbDegre);
+			if(nbDegre > 1)
+			{
+				return true;
+			}
+		}
 	}
-	else
+	//check la case en dessous
+	if(futurMoove.y != jeu.taille)
 	{
-		l->first = f->next;
-		f->next->prev = NULL;
+		adjacentPion = jeu.plateau[(futurMoove.y+1)*jeu.taille + futurMoove.x];
+		//Si la case est vide on peux jouer
+		if(adjacentPion->couleur == VIDE)
+		{
+			return true;
+		}
+		else if(adjacentPion->couleur == jeu.joueurCourant)
+		{
+			//Check si chaine à coté à un degré de liberté > 1
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
+			printf("la chaine en dessous à %d degré de liberté", nbDegre);
+			if(nbDegre > 1)
+			{
+				return true;
+			}
+		}
 	}
-	l->nb--;
-	free(f);
-}
-
-//Retourne la valeur de la tete
-Pion * front_val(Liste* l)
-{
-	assert(l->first != NULL);
-	return l->first->pion;
-}
-
-//Ajout l'element en fin de liste
-Noeud* push_back(Liste* l, Pion * pion)
-{
-	Noeud* n = nouveau_noeud(pion);
-
-	if (l->last == NULL)
+	// check la case à gauche
+	if(futurMoove.x != 0)
 	{
-		l->last = n;
-		l->first = n;
-		l->nb = 1;
-		return n;
+		adjacentPion = jeu.plateau[(futurMoove.y)*jeu.taille + futurMoove.x-1];
+		if(adjacentPion->couleur == VIDE)
+		{
+			return true;
+		}
+		else if(adjacentPion->couleur == jeu.joueurCourant)
+		{
+			//Check si chaine à coté à un degré de liberté > 1
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
+			printf("la chaine à gauche à %d degré de liberté", nbDegre);
+			if(nbDegre > 1)
+			{
+				return true;
+			}
+		}
 	}
 
-	n->prev = l->last;
-	l->last->next = n;
-	l->last = n;
-	l->nb++;
-
-	return n;
-}
-
-//Retire le dernier noeud de la liste
-void pop_back(Liste* l)
-{
-	Noeud* la = l->last;
-
-	if (la == NULL)
-		return;
-
-	if (la == l->first) //(or nb==1)
+	//CHeck le pion à droite
+	if(futurMoove.x != jeu.taille)
 	{
-		l->first = NULL;
-		l->last = NULL;
+		adjacentPion = jeu.plateau[(futurMoove.y)*jeu.taille + futurMoove.x+1];
+		if(adjacentPion->couleur == VIDE)
+		{
+			return true;
+		}
+		else if(adjacentPion->couleur == jeu.joueurCourant)
+		{
+			//Check si chaine à coté à un degré de liberté > 1
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
+			printf("la chaine à droite à %d degré de liberté", nbDegre);
+			if(nbDegre > 1)
+			{
+				return true;
+			}
+		}
 	}
-	else
+	return false;
+}
+
+void playMoove(Jeu jeu, Coord coord, Couleur couleur)
+{
+	Pion * pion = initPion(couleur);
+	pion->coord = coord;
+	//crée sa propre chaine
+	Liste* selfChaine = liste_vide();
+	push_front(selfChaine, pion); //met le pion dedans
+	pion->chaineLie = selfChaine;
+
+	fusionneChaineVoisine(selfChaine);
+
+	jeu.plateau[coord.x + coord.y * jeu.taille] = pion;
+	
+}
+
+void enleverPion(Jeu jeu, Pion * pion)
+{
+	Pion * newPion = initPion(VIDE);
+	newPion->coord = pion->coord;
+	jeu.plateau[pion->coord.x + pion->coord.y * jeu.taille] = newPion;
+}
+
+//Lance le jeu
+void game(int argc, char *argv[])
+{
+	int largeur = 700;
+	int hauteur = 700;
+	for(int i =1;i<argc;i+=2)
 	{
-		l->last = la->prev;
-		la->prev->next = NULL;
+		// Si l'argument est -largeur
+		if(strcmp(argv[i],"-largeur") == 0)
+		{
+			largeur = atoi(argv[i+1]);
+		}
+		// Si l'argument est -largeur
+		if(strcmp(argv[i],"-hauteur") == 0)
+		{
+			hauteur = atoi(argv[i+1]);
+		}
 	}
-	l->nb--;
-	free(la);
+	init_win(largeur,hauteur, "Jeu de GO",246,254,185);
+	jeu = initJeu(taillePlateau);
+  	event_loop();
 }
-
-//Retourne la derniere valeur de la liste
-Pion * back_val(Liste* l)
-{
-	assert(l->last != NULL);
-	return l->last->pion;
-}
-
-
-//affiche la liste
-void print(Liste* l)
-{
-	Noeud* n = l->first;
-	while (n!=NULL)
-	{
-		printf("%d / ",n->pion->couleur);
-		printf("%d / ",n->pion->coord.x);
-		printf("%d / ",n->pion->coord.y);
-		n = n->next;
-	}
-	puts("");
-}
-
-//retourne si la liste est vide ou non
-int est_vide(Liste* l)
-{
-	return l->first == NULL;
-}
-
-//Retourne le premier noeud avec la valeur indiqué
-/*Noeud* trouve_premier(Liste* l, Pion pion)
-{
-	Noeud* no = l->first;
-	while (no!=NULL)
-	{
-		if (no->pion == pion)
-			return no;
-		no = no->next;
-	}
-	return NULL;
-}*/
-
-//Retourne le dernier noeud avec la valeur indiqué
-/*Noeud* trouve_dernier(Liste* l, Pion pion)
-{
-	Noeud* no = l->last;
-	while (no!=NULL)
-	{
-		if (no->pion == pion)
-			return no;
-		no = no->prev;
-	}
-	return NULL;
-}*/
-
-//compte le nombre d'occurence de la valeur dans la liste
-/*int occurence(Liste* l, Pion pion)
-{
-	int nb=0;
-	Noeud* no = l->first;
-	while (no!=NULL)
-	{
-		if (no->pion == pion)
-			nb++;
-		no = no->next;
-	}
-	return nb;
-}*/
-
-//Insert un noeud avec la valeur donné après le noeud donné
-Noeud* insert_after(Liste*l, Noeud* c, Pion pion)
-{
-	Noeud* n = nouveau_noeud(&pion);
-	n->next = c->next;
-	c->next = n;
-	n->prev = c;
-
-	if (c == l->last)
-		l->last = n;
-	else
-		n->next->prev = n;
-
-	l->nb--;
-
-	return n;
-}
-
-//Retire le noeud spécifié de la liste
-void retire(Liste* l, Noeud* n)
-{
-	if (l->first==NULL)
-		return;
-	if (n == l->first)
-		pop_front(l);
-	else if (n == l->last)
-		pop_back(l);
-	else
-	{
-		n->next->prev = n->prev;
-		n->prev->next = n->next;
-		free(n);
-	}
-}
-
-//Permet de supprimer une chaine du plateau (visuel > vide + free de la chaine)
-void removeAllChaine(Liste* chaine1)
-{
-	//Parcours la chaine jusqu'à l'avoir entièrement vidé
-	while(chaine1->first != NULL)
-	{
-		Noeud* currentNode = chaine1->last;
-		currentNode->pion->couleur = VIDE;
-		retire(chaine1, currentNode);
-	}
-}
-
-//Merge la chaine1 avec la chaine2
-void mergeChaine(Liste* chaine1, Liste* chaine2)
-{
-	if(chaine1->first == NULL) //la premiere chaine est vide
-		return;
-	if(chaine2->first == NULL)
-		return;
-
-	chaine1->last->next = chaine2->first; //met a la suite pour lui enfiler l'autre chaine
-	chaine2->first->prev = chaine1->last;
-}
-
-/*
-void apply(Liste* l, void (*fonct)(int*))
-{
-	Noeud* n = l->first;
-	while (n!=NULL)
-	{
-		fonct(&(n->val));
-		n = n->next;
-	}
-}
-*/

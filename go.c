@@ -394,10 +394,12 @@ void playMoove(Jeu jeu, Coord coord, Couleur couleur)
 	//crée sa propre chaine
 	Liste* selfChaine = liste_vide();
 	push_front(selfChaine, pion); //met le pion dedans
-	printf("après push\n");
 	pion->chaineLie = selfChaine;
+
+	fusionneChaineVoisine(selfChaine);
+
 	jeu.plateau[coord.x + coord.y * jeu.taille] = pion;
-	printf("fin play movve \n");
+	
 }
 
 void enleverPion(Jeu jeu, Pion * pion)
@@ -406,6 +408,17 @@ void enleverPion(Jeu jeu, Pion * pion)
 	newPion->coord = pion->coord;
 	jeu.plateau[pion->coord.x + pion->coord.y * jeu.taille] = newPion;
 }
+
+/**
+	Cette fonctionne va check tous les chaines de la meme couleur
+	a coté d'un élement de la chaine, pour faire une seule chaine si plusieurs chaines
+	sont autour
+*/
+void fusionneChaineVoisine(Liste* chaine);
+{
+	
+}
+
 
 //Lance le jeu
 void game(int argc, char *argv[])
