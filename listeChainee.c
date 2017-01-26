@@ -227,6 +227,18 @@ void retire(Liste* l, Noeud* n)
 	}
 }
 
+//Permet de supprimer une chaine du plateau (visuel > vide + free de la chaine)
+void removeAllChaine(Liste* chaine1)
+{
+	//Parcours la chaine jusqu'à l'avoir entièrement vidé
+	while(chaine1->first != NULL)
+	{
+		Noeud* currentNode = chaine1->last;
+		currentNode->pion->couleur = VIDE;
+		retire(chaine1, currentNode);
+	}
+}
+
 //Merge la chaine1 avec la chaine2
 void mergeChaine(Liste* chaine1, Liste* chaine2)
 {
