@@ -33,10 +33,9 @@ void clear(Liste* l)
 }
 
 //Ajout d'un element en tete de la liste
-Noeud* push_front(Liste* l, Pion pion)
+Noeud* push_front(Liste* l, Pion * pion)
 {
-	Noeud* n = nouveau_noeud(&pion);
-
+	Noeud* n = nouveau_noeud(pion);
 	if (l->first == NULL)
 	{
 		l->first = n;
@@ -82,9 +81,9 @@ Pion * front_val(Liste* l)
 }
 
 //Ajout l'element en fin de liste
-Noeud* push_back(Liste* l, Pion pion)
+Noeud* push_back(Liste* l, Pion * pion)
 {
-	Noeud* n = nouveau_noeud(&pion);
+	Noeud* n = nouveau_noeud(pion);
 
 	if (l->last == NULL)
 	{

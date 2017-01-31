@@ -15,7 +15,7 @@ void key_pressed(KeySym code, char c, int x_souris, int y_souris);
 // Initialise une structure jeu
 Jeu initJeu(int taille);
 //Initialise un Pion
-Pion initPion(Couleur couleur);
+Pion * initPion(Couleur couleur);
 Coord initCoord(int x, int y);
 // Renvoie le nombre de degré de liberté d'un pion
 int nbDegreLibertePion(Jeu jeu, Pion pion);
@@ -25,7 +25,7 @@ int nbDegreLiberteChaine(Jeu jeu,Liste liste);
 void playMoove(Jeu jeu, Coord coord, Couleur couleur);
 //Verifie si un coup est authorisé
 bool isAuthorizedMoove(Jeu jeu, Coord futurMoove);
-void enleverPion(Jeu jeu, Pion pion);
+void enleverPion(Jeu jeu, Pion * pion);
 //Lance le jeux
 void game(int argc, char *argv[]);
 

@@ -30,7 +30,7 @@ struct PionDuPlateau {
 typedef struct JeuDeGo {
  Coord lastCoordBlanc;
  Coord lastCoordNoir;
- Pion * plateau;
+ Pion ** plateau;
  int taille;
  Couleur joueurCourant;
 }Jeu;
@@ -57,7 +57,7 @@ Liste* liste_vide(void);
 
 void clear(Liste* l);
 
-Noeud* push_front(Liste* l, Pion pion);
+Noeud* push_front(Liste* l, Pion * pion);
 
 void pop_front(Liste* l);
 
@@ -71,7 +71,7 @@ Noeud* trouve_premier(Liste* l, Pion pion);
 
 int occurence(Liste* l, Pion pion);
 
-Noeud* push_back(Liste* l, Pion pion);
+Noeud* push_back(Liste* l, Pion * pion);
 
 Pion * back_val(Liste* l);
 
