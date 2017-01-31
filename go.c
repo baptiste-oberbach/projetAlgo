@@ -4,7 +4,9 @@
 #include <math.h>
 #include <stdbool.h>
 #include "go.h"
+#include "listeChainee.h"
 #include "dessine.h"
+
 
 
 int taillePlateau = 19;
@@ -132,7 +134,7 @@ void mouse_clicked(int bouton, int x, int y)
 				jeu.joueurCourant = BLANC;
 			}
 		}
-		
+
 		draw_win();
 		/*
 		color( 0.0,0.0,0.0);
@@ -240,36 +242,48 @@ Coord initCoord(int x, int y)
 	return coord;
 }
 
-
-
-bool checkDegreLibertePion(Jeu jeu, Pion pion)
+int nbDegreLibertePion(Jeu jeu, Pion pion)
 {
+	int res = 4;
 	//Check la case au dessus
 	if(pion.coord.y != 0 && jeu.plateau[pion.coord.y-1*jeu.taille + pion.coord.x].couleur != VIDE)
 	{
-		return false;
+		res--;
 	}
 	//Check la case en dessus
 	if(pion.coord.y != jeu.taille-1 &&  jeu.plateau[pion.coord.y+1*jeu.taille + pion.coord.x].couleur != VIDE)
 	{
-		return false;
+		res--;
 	}
 	//Check la case à droite
 	if(pion.coord.x != jeu.taille-1 &&  jeu.plateau[pion.coord.x-1 + pion.coord.y*jeu.taille].couleur != VIDE)
 	{
-		return false;
+		res--;
 	}
 	//Check la case à gauche
 	if(pion.coord.x != 0 &&  jeu.plateau[pion.coord.x+1 + pion.coord.y*jeu.taille].couleur != VIDE)
 	{
-		return false;
+		res--;
 	}
-	return true;
+	return res;
 }
 
-//check si cest un mouvement autorisé 
+int nbDegreLiberteChaine(Jeu jeu,Liste liste)
+{
+	int res = 0;
+	Noeud * noeud = liste.first;
+	do
+	{
+		res += nbDegreLibertePion(jeu,*noeud->pion);
+	}
+	while(noeud != liste.last);
+	return res;
+}
+
+//check si cest un mouvement autorisé
 bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 {
+	//Verif des repétition et de la case déjà occupé
 	//check si la case n'est deja occupé par un autre pion
 	if (jeu.plateau[futurMoove.y*jeu.taille + futurMoove.x].couleur == VIDE)
 	{
@@ -277,7 +291,7 @@ bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 		if(jeu.joueurCourant == NOIR)
 		{
 			if(futurMoove.y == jeu.lastCoordBlanc.y && futurMoove.x == jeu.lastCoordBlanc.x)
-				return false;	
+				return false;
 
 		}
 		else //c'est le joueur blanc
@@ -285,22 +299,57 @@ bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 			if(futurMoove.y == jeu.lastCoordNoir.y && futurMoove.x == jeu.lastCoordNoir.x)
 				return false;
 		}
-		return true;
 	}
 	else
 	{
 		//deja un pion sur cette case, pas le droit de faire ca
 		return false;
 	}
+
+	Pion adjacentPion;
+	//cas d'une cases adjacente vide et n'étant pas le bord => on peux placer le pion
+	//check la case au dessus
+	if(futurMoove.y != 0)
+	{
+		adjacentPion = jeu.plateau[(futurMoove.y-1)*jeu.taille + futurMoove.x];
+		//Si la case est vide on peux jouer
+		if(adjacentPion.couleur == VIDE)
+		{
+			return true;
+		}
+		else if(adjacentPion.couleur == jeu.joueurCourant)
+		{
+			//Check si chaine à coté à liberté
+			return false;
+		}
+	}
+
+
+	//check la case en dessous
+	if(futurMoove.y != jeu.taille && jeu.plateau[(futurMoove.y+1)*jeu.taille + futurMoove.x].couleur == VIDE)
+	{
+		return true;
+	}
+	// check la case à gauche
+	if(futurMoove.x != 0 && jeu.plateau[futurMoove.y*jeu.taille + futurMoove.x-1].couleur == VIDE)
+	{
+		return true;
+	}
+	return false;
 }
 
 void playMoove(Jeu jeu, Coord coord, Couleur couleur)
 {
-	//TODO Check if moove is allowed
-
 	Pion pion = initPion(couleur);
 	pion.coord = coord;
 	jeu.plateau[coord.x + coord.y * jeu.taille] = pion;
+}
+
+void enleverPion(Jeu jeu, Pion pion)
+{
+	Pion newPion = initPion(VIDE);
+	newPion.coord = pion.coord;
+	jeu.plateau[pion.coord.x + pion.coord.y * jeu.taille] = newPion;
 }
 
 //Lance le jeu

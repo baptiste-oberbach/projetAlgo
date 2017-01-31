@@ -4,34 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "dessine.h"
 #include <math.h>
 #include <stdbool.h>
-
-typedef enum Couleur Couleur;
-enum Couleur
-{
-    VIDE, BLANC, NOIR,
-};
-
-typedef struct Coordonnees {
- int x;
- int y;
-}Coord;
-
-typedef struct PionDuPlateau {
- Couleur couleur;
- struct PionDuPlateau* chaineLie;
- Coord coord;
-}Pion;
-
-typedef struct JeuDeGo {
- Coord lastCoordBlanc;
- Coord lastCoordNoir;
- Pion * plateau;
- int taille;
- Couleur joueurCourant;
-}Jeu;
+#include "listeChainee.h"
+#include "dessine.h"
 
 void draw_win(void);
 void mouse_clicked(int bouton, int x, int y);
@@ -41,9 +17,16 @@ Jeu initJeu(int taille);
 //Initialise un Pion
 Pion initPion(Couleur couleur);
 Coord initCoord(int x, int y);
-bool checkDegreLibertePion(Jeu jeu, Pion pion);
+// Renvoie le nombre de degré de liberté d'un pion
+int nbDegreLibertePion(Jeu jeu, Pion pion);
+// Renvoie le nombre de degré de liberté d'une chaine
+int nbDegreLiberteChaine(Jeu jeu,Liste liste);
+//Joue un pion au coordonées coord de la couleur couleur
 void playMoove(Jeu jeu, Coord coord, Couleur couleur);
+//Verifie si un coup est authorisé
 bool isAuthorizedMoove(Jeu jeu, Coord futurMoove);
+void enleverPion(Jeu jeu, Pion pion);
+//Lance le jeux
 void game(int argc, char *argv[]);
 
 #endif /* go_h */

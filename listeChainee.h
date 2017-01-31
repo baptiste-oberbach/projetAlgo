@@ -5,23 +5,53 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-typedef struct sNoeud
+typedef enum Couleur Couleur;
+enum Couleur
 {
-	Pion pion;
+    VIDE, BLANC, NOIR,
+};
+
+typedef struct Coordonnees {
+ int x;
+ int y;
+}Coord;
+
+//Pour gérer la réfrence circulaire
+typedef struct sList Liste;
+typedef struct PionDuPlateau Pion;
+typedef struct sNoeud Noeud;
+
+struct PionDuPlateau {
+ Couleur couleur;
+ Liste * chaineLie;
+ Coord coord;
+};
+
+typedef struct JeuDeGo {
+ Coord lastCoordBlanc;
+ Coord lastCoordNoir;
+ Pion * plateau;
+ int taille;
+ Couleur joueurCourant;
+}Jeu;
+
+struct sNoeud
+{
+	Pion * pion;
 	struct sNoeud* next;
 	struct sNoeud* prev;
-} Noeud;
-	
+};
 
-typedef struct
+
+struct sList
 {
 	 int nb; //nombre de noeud
 	 Noeud* first;
 	 Noeud* last;
-} Liste;
+};
 
 
-Noeud* nouveau_noeud(Pion pion);
+Noeud* nouveau_noeud(Pion * pion);
 
 Liste* liste_vide(void);
 
@@ -31,7 +61,7 @@ Noeud* push_front(Liste* l, Pion pion);
 
 void pop_front(Liste* l);
 
-Pion front_val(Liste* l);
+Pion * front_val(Liste* l);
 
 void print(Liste* l);
 
@@ -43,7 +73,7 @@ int occurence(Liste* l, Pion pion);
 
 Noeud* push_back(Liste* l, Pion pion);
 
-Pion back_val(Liste* l);
+Pion * back_val(Liste* l);
 
 void pop_back(Liste* l);
 

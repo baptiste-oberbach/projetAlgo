@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include <stdlib.h> 
+#include <stdlib.h>
 #include <assert.h>
-#include "go.h"
 #include "listeChainee.h"
 
+
 //Cree un noeud
-Noeud* nouveau_noeud(Pion pion)
+Noeud* nouveau_noeud(Pion * pion)
 {
 	Noeud* n = malloc(sizeof(Noeud));
 	n->pion = pion;
@@ -35,7 +35,7 @@ void clear(Liste* l)
 //Ajout d'un element en tete de la liste
 Noeud* push_front(Liste* l, Pion pion)
 {
-	Noeud* n = nouveau_noeud(pion);
+	Noeud* n = nouveau_noeud(&pion);
 
 	if (l->first == NULL)
 	{
@@ -56,10 +56,10 @@ Noeud* push_front(Liste* l, Pion pion)
 void pop_front(Liste* l)
 {
 	Noeud* f = l->first;
-	
+
 	if (f == NULL)
 		return;
-	
+
 	if (f == l->last) //(or nb==1)
 	{
 		l->first = NULL;
@@ -75,7 +75,7 @@ void pop_front(Liste* l)
 }
 
 //Retourne la valeur de la tete
-Pion front_val(Liste* l)
+Pion * front_val(Liste* l)
 {
 	assert(l->first != NULL);
 	return l->first->pion;
@@ -84,8 +84,8 @@ Pion front_val(Liste* l)
 //Ajout l'element en fin de liste
 Noeud* push_back(Liste* l, Pion pion)
 {
-	Noeud* n = nouveau_noeud(pion);
-	
+	Noeud* n = nouveau_noeud(&pion);
+
 	if (l->last == NULL)
 	{
 		l->last = n;
@@ -93,12 +93,12 @@ Noeud* push_back(Liste* l, Pion pion)
 		l->nb = 1;
 		return n;
 	}
-	
+
 	n->prev = l->last;
 	l->last->next = n;
 	l->last = n;
 	l->nb++;
-		
+
 	return n;
 }
 
@@ -116,7 +116,7 @@ void pop_back(Liste* l)
 		l->last = NULL;
 	}
 	else
-	{	
+	{
 		l->last = la->prev;
 		la->prev->next = NULL;
 	}
@@ -125,7 +125,7 @@ void pop_back(Liste* l)
 }
 
 //Retourne la derniere valeur de la liste
-Pion back_val(Liste* l)
+Pion * back_val(Liste* l)
 {
 	assert(l->last != NULL);
 	return l->last->pion;
@@ -138,9 +138,9 @@ void print(Liste* l)
 	Noeud* n = l->first;
 	while (n!=NULL)
 	{
-		printf("%d / ",n->pion.couleur);
-		printf("%d / ",n->pion.coord.x);
-		printf("%d / ",n->pion.coord.y);
+		printf("%d / ",n->pion->couleur);
+		printf("%d / ",n->pion->coord.x);
+		printf("%d / ",n->pion->coord.y);
 		n = n->next;
 	}
 	puts("");
@@ -195,18 +195,18 @@ int est_vide(Liste* l)
 //Insert un noeud avec la valeur donné après le noeud donné
 Noeud* insert_after(Liste*l, Noeud* c, Pion pion)
 {
-	Noeud* n = nouveau_noeud(pion);
+	Noeud* n = nouveau_noeud(&pion);
 	n->next = c->next;
 	c->next = n;
 	n->prev = c;
-	
+
 	if (c == l->last)
 		l->last = n;
 	else
 		n->next->prev = n;
-	
+
 	l->nb--;
-	 
+
 	return n;
 }
 
