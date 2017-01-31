@@ -24,12 +24,12 @@ typedef struct sNoeud Noeud;
 struct PionDuPlateau {
  Couleur couleur;
  Liste * chaineLie;
- Coord coord;
+ Coord * coord;
 };
 
 typedef struct JeuDeGo {
- Coord lastCoordBlanc;
- Coord lastCoordNoir;
+ Coord * lastCoordBlanc;
+ Coord * lastCoordNoir;
  Pion ** plateau;
  int taille;
  Couleur joueurCourant;

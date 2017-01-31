@@ -138,8 +138,8 @@ void print(Liste* l)
 	while (n!=NULL)
 	{
 		printf("%d / ",n->pion->couleur);
-		printf("%d / ",n->pion->coord.x);
-		printf("%d / ",n->pion->coord.y);
+		printf("%d / ",n->pion->coord->x);
+		printf("%d / ",n->pion->coord->y);
 		n = n->next;
 	}
 	puts("");

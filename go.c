@@ -10,7 +10,7 @@
 
 
 int taillePlateau = 19;
-Jeu jeu;
+Jeu * jeu;
 
 
 /**
@@ -76,10 +76,10 @@ void draw_win()
 		for(int j = 0; j < taillePlateau; j++)
 		{
 			//Si il existe un pion sur ce croisement
-			if(jeu.plateau[i*taillePlateau+j]->couleur != VIDE)
+			if(jeu->plateau[i*taillePlateau+j]->couleur != VIDE)
 			{
 				//Choix de la couleur
-				if(jeu.plateau[i*taillePlateau+j]->couleur == BLANC)
+				if(jeu->plateau[i*taillePlateau+j]->couleur == BLANC)
 				{
 					color(1.0,1.0,1.0);
 				}
@@ -118,45 +118,50 @@ void mouse_clicked(int bouton, int x, int y)
 		posY = posY<0 ? 0 :posY;
 
 		printf("largeur :%d hauteur :%d \n",posX,posY);
-		Coord coord = initCoord(posX,posY);
+		Coord * coord = initCoord(posX,posY);
 
-		if(isAuthorizedMoove(jeu, coord))
+		if(isAuthorizedMoove(jeu, *coord))
 		{
-			playMoove(jeu,coord,jeu.joueurCourant);
-			if(jeu.joueurCourant == BLANC)
+			playMoove(jeu,coord,jeu->joueurCourant);
+			if(jeu->joueurCourant == BLANC)
 			{
-				jeu.lastCoordBlanc = coord;
-				jeu.joueurCourant = NOIR;
+				jeu->lastCoordBlanc = coord;
+				jeu->joueurCourant = NOIR;
 			}
 			else
 			{
-				jeu.lastCoordNoir = coord;
-				jeu.joueurCourant = BLANC;
+				jeu->lastCoordNoir = coord;
+				jeu->joueurCourant = BLANC;
 			}
 		}
+		else
+		{
+			free(coord);
+		}
+
 		draw_win();
 	}
 	//Si clique droit
 	if(bouton == 3)
 	{
 		// Si les deux joueurs ont passé l'un après l'autre
-		if((jeu.joueurCourant == BLANC && jeu.lastCoordNoir.x == -1) || (jeu.joueurCourant == NOIR && jeu.lastCoordBlanc.x == -1))
+		if((jeu->joueurCourant == BLANC && jeu->lastCoordNoir->x == -1) || (jeu->joueurCourant == NOIR && jeu->lastCoordBlanc->x == -1))
 		{
 			printf("Deux passage consécutif, fin du jeux \n");
 		}
 		else
 		{
 			//Le joueur Blanc passe
-			if(jeu.joueurCourant == BLANC)
+			if(jeu->joueurCourant == BLANC)
 			{
-				jeu.joueurCourant = NOIR;
-				jeu.lastCoordBlanc = initCoord(-1,-1);
+				jeu->joueurCourant = NOIR;
+				jeu->lastCoordBlanc = initCoord(-1,-1);
 			}
 			//Le joueur Noir passe
 			else
 			{
-				jeu.joueurCourant = BLANC;
-				jeu.lastCoordNoir = initCoord(-1,-1);
+				jeu->joueurCourant = BLANC;
+				jeu->lastCoordNoir = initCoord(-1,-1);
 			}
 		}
 	}
@@ -201,7 +206,7 @@ void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 
 }
 // Initialise une structure jeu
-Jeu initJeu(int taille)
+Jeu * initJeu(int taille)
 {
 	Pion ** plateau= malloc(sizeof(Pion*)* taille * taille);
 	//Initialise le plateau pour chaque croisement
@@ -214,12 +219,12 @@ Jeu initJeu(int taille)
 			plateau[i*taille+j] = pion;
 		}
 	}
-	Jeu jeu;
-	jeu.plateau = plateau;
-	jeu.lastCoordBlanc = initCoord(-2,-2);
-	jeu.lastCoordNoir = initCoord(-2,-2);
-	jeu.taille = taille;
-	jeu.joueurCourant = NOIR;
+	Jeu * jeu = malloc(sizeof(Jeu));
+	jeu->plateau = plateau;
+	jeu->lastCoordBlanc = initCoord(-2,-2);
+	jeu->lastCoordNoir = initCoord(-2,-2);
+	jeu->taille = taille;
+	jeu->joueurCourant = NOIR;
 	return jeu;
 }
 
@@ -231,69 +236,76 @@ Pion * initPion(Couleur couleur)
 	return pion;
 }
 
-Coord initCoord(int x, int y)
+Coord * initCoord(int x, int y)
 {
-	Coord coord;
-	coord.x = x;
-	coord.y = y;
+	Coord * coord = malloc(sizeof(coord));
+	coord->x = x;
+	coord->y = y;
 	return coord;
 }
 
-int nbDegreLibertePion(Jeu jeu, Pion pion)
+int nbDegreLibertePion(Jeu * jeu, Pion * pion)
 {
-	int res = 4;
+	int res = 0;
+	printf("check degre liberte du pion x:%d y:%d\n",pion->coord->x, pion->coord->y );
+	Pion * test = jeu->plateau[pion->coord->y-1*jeu->taille + pion->coord->x];
+	printf("%d \n",test->coord->x);
+	printf("check 1 \n");
 	//Check la case au dessus
-	if(pion.coord.y == 0 && jeu.plateau[pion.coord.y-1*jeu.taille + pion.coord.x]->couleur != VIDE)
+	if(pion->coord->y != 0 && jeu->plateau[pion->coord->y-1*jeu->taille + pion->coord->x]->couleur == VIDE)
 	{
-		res--;
+		res++;
 	}
+		printf("check 2 \n");
 	//Check la case en dessus
-	if(pion.coord.y == jeu.taille-1 ||  jeu.plateau[pion.coord.y+1*jeu.taille + pion.coord.x]->couleur != VIDE)
+	if(pion->coord->y != jeu->taille-1 &&  jeu->plateau[pion->coord->y+1*jeu->taille + pion->coord->x]->couleur == VIDE)
 	{
-		res--;
+		res++;
 	}
+		printf("check 3 \n");
 	//Check la case à droite
-	if(pion.coord.x == jeu.taille-1 ||  jeu.plateau[pion.coord.x-1 + pion.coord.y*jeu.taille]->couleur != VIDE)
+	if(pion->coord->x != jeu->taille-1 &&  jeu->plateau[pion->coord->x-1 + pion->coord->y*jeu->taille]->couleur == VIDE)
 	{
-		res--;
+		res++;
 	}
+		printf("check 4 \n");
 	//Check la case à gauche
-	if(pion.coord.x == 0 &&  jeu.plateau[pion.coord.x+1 + pion.coord.y*jeu.taille]->couleur != VIDE)
+	if(pion->coord->x != 0 &&  jeu->plateau[pion->coord->x+1 + pion->coord->y*jeu->taille]->couleur == VIDE)
 	{
-		res--;
+		res++;
 	}
 	return res;
 }
 
-int nbDegreLiberteChaine(Jeu jeu,Liste liste)
+int nbDegreLiberteChaine(Jeu * jeu,Liste liste)
 {
 	int res = 0;
 	Noeud * noeud = liste.first;
 	do
 	{
-		res += nbDegreLibertePion(jeu,*noeud->pion);
+		res += nbDegreLibertePion(jeu,noeud->pion);
 	}
 	while(noeud != liste.last);
 	return res;
 }
 
 //check si cest un mouvement autorisé
-bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
+bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 {
 	//Verif des repétition et de la case déjà occupé
 	//check si la case n'est deja occupé par un autre pion
-	if (jeu.plateau[futurMoove.y*jeu.taille + futurMoove.x]->couleur == VIDE)
+	if (jeu->plateau[futurMoove.y*jeu->taille + futurMoove.x]->couleur == VIDE)
 	{
 		//check le cas de répétition
-		if(jeu.joueurCourant == NOIR)
+		if(jeu->joueurCourant == NOIR)
 		{
-			if(futurMoove.y == jeu.lastCoordBlanc.y && futurMoove.x == jeu.lastCoordBlanc.x)
+			if(futurMoove.y == jeu->lastCoordBlanc->y && futurMoove.x == jeu->lastCoordBlanc->x)
 				return false;
 
 		}
 		else //c'est le joueur blanc
 		{
-			if(futurMoove.y == jeu.lastCoordNoir.y && futurMoove.x == jeu.lastCoordNoir.x)
+			if(futurMoove.y == jeu->lastCoordNoir->y && futurMoove.x == jeu->lastCoordNoir->x)
 				return false;
 		}
 	}
@@ -302,19 +314,19 @@ bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 		//deja un pion sur cette case, pas le droit de faire ca
 		return false;
 	}
-
+	printf("future moove x:%d y:%d \n",futurMoove.x,futurMoove.y);
 	Pion  * adjacentPion;
 	//cas d'une cases adjacente vide et n'étant pas le bord => on peux placer le pion
 	//check la case au dessus
 	if(futurMoove.y != 0)
 	{
-		adjacentPion = jeu.plateau[(futurMoove.y-1)*jeu.taille + futurMoove.x];
+		adjacentPion = jeu->plateau[(futurMoove.y-1)*jeu->taille + futurMoove.x];
 		//Si la case est vide on peux jouer
 		if(adjacentPion->couleur == VIDE)
 		{
 			return true;
 		}
-		else if(adjacentPion->couleur == jeu.joueurCourant)
+		else if(adjacentPion->couleur == jeu->joueurCourant)
 		{
 			//Check si chaine à coté à un degré de liberté > 1
 			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
@@ -326,15 +338,15 @@ bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 		}
 	}
 	//check la case en dessous
-	if(futurMoove.y != jeu.taille)
+	if(futurMoove.y != jeu->taille)
 	{
-		adjacentPion = jeu.plateau[(futurMoove.y+1)*jeu.taille + futurMoove.x];
+		adjacentPion = jeu->plateau[(futurMoove.y+1)*jeu->taille + futurMoove.x];
 		//Si la case est vide on peux jouer
 		if(adjacentPion->couleur == VIDE)
 		{
 			return true;
 		}
-		else if(adjacentPion->couleur == jeu.joueurCourant)
+		else if(adjacentPion->couleur == jeu->joueurCourant)
 		{
 			//Check si chaine à coté à un degré de liberté > 1
 			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
@@ -348,12 +360,12 @@ bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 	// check la case à gauche
 	if(futurMoove.x != 0)
 	{
-		adjacentPion = jeu.plateau[(futurMoove.y)*jeu.taille + futurMoove.x-1];
+		adjacentPion = jeu->plateau[(futurMoove.y)*jeu->taille + futurMoove.x-1];
 		if(adjacentPion->couleur == VIDE)
 		{
 			return true;
 		}
-		else if(adjacentPion->couleur == jeu.joueurCourant)
+		else if(adjacentPion->couleur == jeu->joueurCourant)
 		{
 			//Check si chaine à coté à un degré de liberté > 1
 			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
@@ -366,14 +378,14 @@ bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 	}
 
 	//CHeck le pion à droite
-	if(futurMoove.x != jeu.taille)
+	if(futurMoove.x != jeu->taille)
 	{
-		adjacentPion = jeu.plateau[(futurMoove.y)*jeu.taille + futurMoove.x+1];
+		adjacentPion = jeu->plateau[(futurMoove.y)*jeu->taille + futurMoove.x+1];
 		if(adjacentPion->couleur == VIDE)
 		{
 			return true;
 		}
-		else if(adjacentPion->couleur == jeu.joueurCourant)
+		else if(adjacentPion->couleur == jeu->joueurCourant)
 		{
 			//Check si chaine à coté à un degré de liberté > 1
 			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
@@ -387,7 +399,7 @@ bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 	return false;
 }
 
-void playMoove(Jeu jeu, Coord coord, Couleur couleur)
+void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 {
 	Pion * pion = initPion(couleur);
 	pion->coord = coord;
@@ -396,15 +408,15 @@ void playMoove(Jeu jeu, Coord coord, Couleur couleur)
 	push_front(selfChaine, pion); //met le pion dedans
 	printf("après push\n");
 	pion->chaineLie = selfChaine;
-	jeu.plateau[coord.x + coord.y * jeu.taille] = pion;
+	jeu->plateau[coord->x + coord->y * jeu->taille] = pion;
 	printf("fin play movve \n");
 }
 
-void enleverPion(Jeu jeu, Pion * pion)
+void enleverPion(Jeu * jeu, Pion * pion)
 {
 	Pion * newPion = initPion(VIDE);
 	newPion->coord = pion->coord;
-	jeu.plateau[pion->coord.x + pion->coord.y * jeu.taille] = newPion;
+	jeu->plateau[pion->coord->x + pion->coord->y * jeu->taille] = newPion;
 }
 
 //Lance le jeu
