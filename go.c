@@ -246,22 +246,22 @@ int nbDegreLibertePion(Jeu jeu, Pion pion)
 {
 	int res = 4;
 	//Check la case au dessus
-	if(pion.coord.y != 0 && jeu.plateau[pion.coord.y-1*jeu.taille + pion.coord.x].couleur != VIDE)
+	if(pion.coord.y == 0 && jeu.plateau[pion.coord.y-1*jeu.taille + pion.coord.x].couleur != VIDE)
 	{
 		res--;
 	}
 	//Check la case en dessus
-	if(pion.coord.y != jeu.taille-1 &&  jeu.plateau[pion.coord.y+1*jeu.taille + pion.coord.x].couleur != VIDE)
+	if(pion.coord.y == jeu.taille-1 ||  jeu.plateau[pion.coord.y+1*jeu.taille + pion.coord.x].couleur != VIDE)
 	{
 		res--;
 	}
 	//Check la case à droite
-	if(pion.coord.x != jeu.taille-1 &&  jeu.plateau[pion.coord.x-1 + pion.coord.y*jeu.taille].couleur != VIDE)
+	if(pion.coord.x == jeu.taille-1 ||  jeu.plateau[pion.coord.x-1 + pion.coord.y*jeu.taille].couleur != VIDE)
 	{
 		res--;
 	}
 	//Check la case à gauche
-	if(pion.coord.x != 0 &&  jeu.plateau[pion.coord.x+1 + pion.coord.y*jeu.taille].couleur != VIDE)
+	if(pion.coord.x == 0 &&  jeu.plateau[pion.coord.x+1 + pion.coord.y*jeu.taille].couleur != VIDE)
 	{
 		res--;
 	}
@@ -319,21 +319,73 @@ bool isAuthorizedMoove(Jeu jeu, Coord futurMoove)
 		}
 		else if(adjacentPion.couleur == jeu.joueurCourant)
 		{
-			//Check si chaine à coté à liberté
-			return false;
+			//Check si chaine à coté à un degré de liberté > 1
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion.chaineLie));
+			printf("la chaine au dessus à %d degré de liberté", nbDegre);
+			if(nbDegre > 1)
+			{
+				return true;
+			}
+		}
+	}
+	//check la case en dessous
+	if(futurMoove.y != jeu.taille)
+	{
+		adjacentPion = jeu.plateau[(futurMoove.y+1)*jeu.taille + futurMoove.x];
+		//Si la case est vide on peux jouer
+		if(adjacentPion.couleur == VIDE)
+		{
+			return true;
+		}
+		else if(adjacentPion.couleur == jeu.joueurCourant)
+		{
+			//Check si chaine à coté à un degré de liberté > 1
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion.chaineLie));
+			printf("la chaine en dessous à %d degré de liberté", nbDegre);
+			if(nbDegre > 1)
+			{
+				return true;
+			}
+		}
+	}
+	// check la case à gauche
+	if(futurMoove.x != 0)
+	{
+		adjacentPion = jeu.plateau[(futurMoove.y)*jeu.taille + futurMoove.x-1];
+		if(adjacentPion.couleur == VIDE)
+		{
+			return true;
+		}
+		else if(adjacentPion.couleur == jeu.joueurCourant)
+		{
+			//Check si chaine à coté à un degré de liberté > 1
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion.chaineLie));
+			printf("la chaine à gauche à %d degré de liberté", nbDegre);
+			if(nbDegre > 1)
+			{
+				return true;
+			}
 		}
 	}
 
-
-	//check la case en dessous
-	if(futurMoove.y != jeu.taille && jeu.plateau[(futurMoove.y+1)*jeu.taille + futurMoove.x].couleur == VIDE)
+	//CHeck le pion à droite
+	if(futurMoove.x != jeu.taille)
 	{
-		return true;
-	}
-	// check la case à gauche
-	if(futurMoove.x != 0 && jeu.plateau[futurMoove.y*jeu.taille + futurMoove.x-1].couleur == VIDE)
-	{
-		return true;
+		adjacentPion = jeu.plateau[(futurMoove.y)*jeu.taille + futurMoove.x+1];
+		if(adjacentPion.couleur == VIDE)
+		{
+			return true;
+		}
+		else if(adjacentPion.couleur == jeu.joueurCourant)
+		{
+			//Check si chaine à coté à un degré de liberté > 1
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion.chaineLie));
+			printf("la chaine à droite à %d degré de liberté", nbDegre);
+			if(nbDegre > 1)
+			{
+				return true;
+			}
+		}
 	}
 	return false;
 }
