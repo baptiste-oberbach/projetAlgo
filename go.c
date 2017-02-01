@@ -410,7 +410,6 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 	pion->chaineLie = selfChaine;
 	fusionneChaineVoisine(pion);
 	jeu.plateau[coord.x + coord.y * jeu.taille] = pion;
-
 }
 
 void enleverPion(Jeu * jeu, Pion * pion)
@@ -431,7 +430,7 @@ void fusionneChaineVoisine(Pion * pion, Jeu * jeu);
 	int y = pion->coord->y;
 	//Fusionne la chaine en haut
 	if(y > 0 && jeu->tableau[(y+1*jeu->taille)+x]->couleur == pion->couleur)
-		
+
 }
 
 
