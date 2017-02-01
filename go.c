@@ -248,17 +248,18 @@ int nbDegreLibertePion(Jeu * jeu, Pion * pion)
 {
 	int res = 0;
 	printf("check degre liberte du pion x:%d y:%d\n",pion->coord->x, pion->coord->y );
-	Pion * test = jeu->plateau[pion->coord->y-1*jeu->taille + pion->coord->x];
+//	printf("pion coord y %d taille %d pion coord y %d \n",pion->coord->y, );
+	Pion * test = jeu->plateau[(pion->coord->y-1)*jeu->taille + pion->coord->x];
 	printf("%d \n",test->coord->x);
 	printf("check 1 \n");
 	//Check la case au dessus
-	if(pion->coord->y != 0 && jeu->plateau[pion->coord->y-1*jeu->taille + pion->coord->x]->couleur == VIDE)
+	if(pion->coord->y != 0 && jeu->plateau[(pion->coord->y-1)*jeu->taille + pion->coord->x]->couleur == VIDE)
 	{
 		res++;
 	}
 		printf("check 2 \n");
 	//Check la case en dessus
-	if(pion->coord->y != jeu->taille-1 &&  jeu->plateau[pion->coord->y+1*jeu->taille + pion->coord->x]->couleur == VIDE)
+	if(pion->coord->y != jeu->taille-1 &&  jeu->plateau[(pion->coord->y+1)*jeu->taille + pion->coord->x]->couleur == VIDE)
 	{
 		res++;
 	}
