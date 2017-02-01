@@ -207,19 +207,12 @@ Jeu initJeu(int taille)
 	//Initialise le plateau pour chaque croisement
 	for(int i = 0;i < taille; i++)
 	{
-<<<<<<< HEAD
-		printf("%d / ",n->pion->couleur);
-		printf("%d / ",n->pion->coord->x);
-		printf("%d / ",n->pion->coord->y);
-		n = n->next;
-=======
 		for(int j = 0; j < taille; j++)
 		{
 			Pion * pion = initPion(VIDE);
 			pion->coord = initCoord(j,i);
 			plateau[i*taille+j] = pion;
 		}
->>>>>>> a79c89adffdf70c66034039a0b84283f57fcdabf
 	}
 	Jeu jeu;
 	jeu.plateau = plateau;

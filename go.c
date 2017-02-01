@@ -408,16 +408,13 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 	Liste* selfChaine = liste_vide();
 	push_front(selfChaine, pion); //met le pion dedans
 	pion->chaineLie = selfChaine;
-<<<<<<< HEAD
+
 	jeu->plateau[coord->x + coord->y * jeu->taille] = pion;
-	printf("fin play movve \n");
-=======
 
 	fusionneChaineVoisine(selfChaine);
 
 	jeu.plateau[coord.x + coord.y * jeu.taille] = pion;
 	
->>>>>>> a79c89adffdf70c66034039a0b84283f57fcdabf
 }
 
 void enleverPion(Jeu * jeu, Pion * pion)
