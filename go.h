@@ -23,16 +23,14 @@ int nbDegreLibertePion(Jeu * jeu, Pion * pion);
 int nbDegreLiberteChaine(Jeu * jeu,Liste liste);
 //Joue un pion au coordonées coord de la couleur couleur
 void playMoove(Jeu * jeu, Coord * coord, Couleur couleur);
+// Verifie si le pion adjacentePion créer une chaine avec une liberte ou capture une chaine ennemie
+bool isAuthorizedSense(Jeu * jeu, Pion * adjacentePion);
 //Verifie si un coup est authorisé
-<<<<<<< HEAD
 bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove);
 void enleverPion(Jeu * jeu, Pion * pion);
-=======
-bool isAuthorizedMoove(Jeu jeu, Coord futurMoove);
-void enleverPion(Jeu jeu, Pion * pion);
+void enleverChaine(Jeu * jeu, Liste * liste);
+void fusionneChaineVoisine(Jeu * jeu,Pion * pion);
 
-void fusionneChaineVoisine(Liste* chaine);
->>>>>>> a79c89adffdf70c66034039a0b84283f57fcdabf
 //Lance le jeux
 void game(int argc, char *argv[]);
 

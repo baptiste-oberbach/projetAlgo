@@ -138,8 +138,8 @@ void print(Liste* l)
 	while (n!=NULL)
 	{
 		printf("%d / ",n->pion->couleur);
-		printf("%d / ",n->pion->coord.x);
-		printf("%d / ",n->pion->coord.y);
+		printf("%d / ",n->pion->coord->x);
+		printf("%d / ",n->pion->coord->y);
 		n = n->next;
 	}
 	puts("");
@@ -229,6 +229,11 @@ void retire(Liste* l, Noeud* n)
 //Permet de supprimer une chaine du plateau (visuel > vide + free de la chaine)
 void removeAllChaine(Liste* chaine1)
 {
+	while(chaine1->nb >0)
+	{
+
+	}
+
 	//Parcours la chaine jusqu'à l'avoir entièrement vidé
 	while(chaine1->first != NULL)
 	{
@@ -241,13 +246,19 @@ void removeAllChaine(Liste* chaine1)
 //Merge la chaine1 avec la chaine2
 void mergeChaine(Liste* chaine1, Liste* chaine2)
 {
+	printf("merge chaine \n");
 	if(chaine1->first == NULL) //la premiere chaine est vide
 		return;
 	if(chaine2->first == NULL)
 		return;
 
 	chaine1->last->next = chaine2->first; //met a la suite pour lui enfiler l'autre chaine
-	chaine2->first->prev = chaine1->last;
+	chaine2->last->prev = chaine1->last;
+	chaine1->last = chaine2->last;
+	chaine2->first = chaine1->first;
+	int somme = chaine1->nb+ chaine2->nb;
+	chaine1->nb = somme;
+	chaine2->nb = somme;
 }
 
 /*
