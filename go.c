@@ -307,13 +307,13 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		//check le cas de répétition
 		if(jeu->joueurCourant == NOIR)
 		{
-			if(futurMoove.y == jeu->lastCoordBlanc->y && futurMoove.x == jeu->lastCoordBlanc->x)
+			if(futurMoove.y == jeu->lastCoordNoir->y && futurMoove.x == jeu->lastCoordNoir->x)
 				return false;
 
 		}
 		else //c'est le joueur blanc
 		{
-			if(futurMoove.y == jeu->lastCoordNoir->y && futurMoove.x == jeu->lastCoordNoir->x)
+			if(futurMoove.y == jeu->lastCoordBlanc->y && futurMoove.x == jeu->lastCoordBlanc->x)
 				return false;
 		}
 	}
