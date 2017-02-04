@@ -59,7 +59,7 @@ void pop_front(Liste* l)
 	if (f == NULL)
 		return;
 
-	if (f == l->last) //(or nb==1)
+	if (l->nb == 1) //(or nb==1)
 	{
 		l->first = NULL;
 		l->last = NULL;

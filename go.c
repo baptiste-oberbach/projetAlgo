@@ -172,6 +172,7 @@ void mouse_clicked(int bouton, int x, int y)
  * c caractère correspondant si caractere
  * x_souris,y_souris position de la souris
  */
+
 void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 {
 }
@@ -246,17 +247,23 @@ int nbDegreLiberteChaine(Jeu * jeu,Liste liste)
 {
 	int res = 0;
 	Noeud * noeud = liste.first;
+	for(int i =0; i<liste.nb; i++)
+	{
+		res += nbDegreLibertePion(jeu,noeud->pion);
+		noeud = noeud->next;
+	}
+	return res;
+	/*
 	while(noeud != liste.last)
 	{
 		res += nbDegreLibertePion(jeu,noeud->pion);
 		noeud = noeud->next;
 	}
-
 	if(liste.nb == 1)
 	{
 		res+= nbDegreLibertePion(jeu,noeud->pion);
 	}
-	return res;
+	return res;*/
 }
 
 bool isAuthorizedSense(Jeu * jeu, Pion * adjacentPion)
@@ -379,9 +386,9 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 		//Test seulement si le pion du dessus est de la couleur opposé
 		if(adjacentPion->couleur != VIDE && adjacentPion->couleur != jeu->joueurCourant)
 		{
-			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 			printf("Check de la chaine : ");
 			print(adjacentPion->chaineLie);
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 			printf("il y a %d degré de liberté \n", nbDegre);
 			if(nbDegre == 0)
 			{
@@ -395,9 +402,9 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 		adjacentPion = jeu->plateau[(coord->y+1)*jeu->taille + coord->x];
 		if(adjacentPion->couleur != VIDE && adjacentPion->couleur != jeu->joueurCourant)
 		{
-			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 			printf("Check de la chaine : ");
 			print(adjacentPion->chaineLie);
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 			printf("il y a %d degré de liberté \n", nbDegre);
 			if(nbDegre == 0)
 			{
@@ -412,9 +419,9 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 		adjacentPion = jeu->plateau[(coord->y)*jeu->taille + coord->x - 1 ];
 		if(adjacentPion->couleur != VIDE && adjacentPion->couleur != jeu->joueurCourant)
 		{
-			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 			printf("Check de la chaine : ");
 			print(adjacentPion->chaineLie);
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 			printf("il y a %d degré de liberté \n", nbDegre);
 			if(nbDegre == 0)
 			{
@@ -431,9 +438,9 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 		adjacentPion = jeu->plateau[(coord->y)*jeu->taille + coord->x + 1];
 		if(adjacentPion->couleur != VIDE && adjacentPion->couleur != jeu->joueurCourant)
 		{
-			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 			printf("Check de la chaine : ");
 			print(adjacentPion->chaineLie);
+			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 			printf("il y a %d degré de liberté \n", nbDegre);
 			if(nbDegre == 0)
 			{
@@ -456,24 +463,28 @@ void enleverPion(Jeu * jeu, Pion * pion)
 void enleverChaine(Jeu * jeu, Liste * liste)
 {
 	Noeud * noeud = liste->first;
-	if(noeud == liste->last)
+	if(liste->nb==1)
 	{
-				enleverPion(jeu,noeud->pion);
+		enleverPion(jeu,noeud->pion);
 	}
 	else
 	{
+		for(int i =0; i< liste->nb;i++)
+		{
+			enleverPion(jeu,noeud->pion);
+			noeud = noeud->next;
+		}
+		/*
 		do
 		{
 			enleverPion(jeu,noeud->pion);
 			noeud = noeud->next;
 		}
-		while(noeud != liste->last);
+		while(noeud != liste->last);*/
 	}
-
 	//Vide la chaine
 	clear(liste);
 	//removeAllChaine(liste);
-	free(liste);
 }
 /**
 	Cette fonctionne va check tous les chaines de la meme couleur
