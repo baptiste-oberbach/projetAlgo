@@ -251,14 +251,26 @@ void mergeChaine(Liste* chaine1, Liste* chaine2)
 		return;
 	if(chaine2->first == NULL)
 		return;
-
+	print(chaine1);
+	print(chaine2);
+	if(chaine1 == chaine2)
+	{
+		printf("Les chaines sont identiques \n");
+			return;
+	}
 	chaine1->last->next = chaine2->first; //met a la suite pour lui enfiler l'autre chaine
-	chaine2->last->prev = chaine1->last;
 	chaine1->last = chaine2->last;
-	chaine2->first = chaine1->first;
 	int somme = chaine1->nb+ chaine2->nb;
 	chaine1->nb = somme;
-	chaine2->nb = somme;
+	//free(chaine2);
+	//On donne la chaine1 à tous les pions de la chaine
+	Noeud * n = chaine1->first;
+	for(int i = 0; i< somme; i++)
+	{
+		n->pion->chaineLie = chaine1;
+		n = n->next;
+	}
+	return;
 }
 
 /*
