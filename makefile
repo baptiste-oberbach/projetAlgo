@@ -6,7 +6,7 @@ CFLAGS = -std=c99 -g -W -Wall -Wmissing-declarations -Wmissing-prototypes -Wredu
 
 LIBS = -lm -lX11
 
-SRC= testGo.c listeChainee.c dessine.c go.c
+SRC= testGo.c listeChainee.c dessine.c go.c sgfSaveHelper.c
 
 all : testGo
 

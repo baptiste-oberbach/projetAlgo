@@ -6,11 +6,13 @@
 #include "go.h"
 #include "listeChainee.h"
 #include "dessine.h"
+#include "sgfSaveHelper.h"
 
 
 
 int taillePlateau = 19;
 Jeu * jeu;
+DeroulementPartie* deroulementPartie;
 
 
 /**
@@ -101,68 +103,82 @@ void draw_win()
  */
 void mouse_clicked(int bouton, int x, int y)
 {
-	//Si clique gauche
-	if(bouton == 1)
+	if(jeu->isFinish)
 	{
-		double uniteHauteur = height_win()/(taillePlateau+1);
-		double uniteLargeur = width_win()/(taillePlateau+1);
+		//phase ou on enleve les pions conflictuels
 
-		double dX = x/uniteLargeur;
-		double dY = y/uniteHauteur;
-		// Calcul de la position dans le plateau
-		int posX = floor(dX+0.5)-1;
-		int posY = floor(dY+0.5)-1;
-		// Cas des bords du tableau
-		posX = posX<0 ? 0 :posX;
-		posY = posY<0 ? 0 :posY;
-
-		Coord * coord = initCoord(posX,posY);
-
-		if(isAuthorizedMoove(jeu, *coord))
+		//Si clique gauche
+		if(bouton == 1)
 		{
-			playMoove(jeu,coord,jeu->joueurCourant);
-			if(jeu->joueurCourant == BLANC)
+		}
+
+	}else{
+
+
+		//Si clique gauche
+		if(bouton == 1)
+		{
+			double uniteHauteur = height_win()/(taillePlateau+1);
+			double uniteLargeur = width_win()/(taillePlateau+1);
+
+			double dX = x/uniteLargeur;
+			double dY = y/uniteHauteur;
+			// Calcul de la position dans le plateau
+			int posX = floor(dX+0.5)-1;
+			int posY = floor(dY+0.5)-1;
+			// Cas des bords du tableau
+			posX = posX<0 ? 0 :posX;
+			posY = posY<0 ? 0 :posY;
+
+			Coord * coord = initCoord(posX,posY);
+
+			if(isAuthorizedMoove(jeu, *coord))
 			{
-				jeu->lastCoordBlanc = coord;
-				jeu->joueurCourant = NOIR;
+				playMoove(jeu,coord,jeu->joueurCourant);
+				if(jeu->joueurCourant == BLANC)
+				{
+					jeu->lastCoordBlanc = coord;
+					jeu->joueurCourant = NOIR;
+				}
+				else
+				{
+					jeu->lastCoordNoir = coord;
+					jeu->joueurCourant = BLANC;
+				}
 			}
 			else
 			{
-				jeu->lastCoordNoir = coord;
-				jeu->joueurCourant = BLANC;
+				free(coord);
 			}
+			draw_win();
 		}
-		else
+		//Si clique droit
+		if(bouton == 3)
 		{
-			free(coord);
-		}
-		draw_win();
-	}
-	//Si clique droit
-	if(bouton == 3)
-	{
-		// Si les deux joueurs ont passé l'un après l'autre
-		if((jeu->joueurCourant == BLANC && jeu->lastCoordNoir->x == -1) || (jeu->joueurCourant == NOIR && jeu->lastCoordBlanc->x == -1))
-		{
-			printf("Deux passage consécutif, fin du jeux \n");
-		}
-		else
-		{
-			//Le joueur Blanc passe
-			if(jeu->joueurCourant == BLANC)
+			// Si les deux joueurs ont passé l'un après l'autre
+			if((jeu->joueurCourant == BLANC && jeu->lastCoordNoir->x == -1) || (jeu->joueurCourant == NOIR && jeu->lastCoordBlanc->x == -1))
 			{
-				jeu->joueurCourant = NOIR;
-				jeu->lastCoordBlanc = initCoord(-1,-1);
+				printf("Deux passage consécutif, fin du jeux \n");
+				//Pour nous, le jeu est terminé, passe cette variable a true pour que les prochains cliques soient gérer différements (pour qu'on puisse enlever les pions conflictuelles du plateau)
+				jeu->isFinish = true;
 			}
-			//Le joueur Noir passe
 			else
 			{
-				jeu->joueurCourant = BLANC;
-				jeu->lastCoordNoir = initCoord(-1,-1);
+				//Le joueur Blanc passe
+				if(jeu->joueurCourant == BLANC)
+				{
+					jeu->joueurCourant = NOIR;
+					jeu->lastCoordBlanc = initCoord(-1,-1);
+				}
+				//Le joueur Noir passe
+				else
+				{
+					jeu->joueurCourant = BLANC;
+					jeu->lastCoordNoir = initCoord(-1,-1);
+				}
 			}
 		}
 	}
-
 }
 
 
@@ -175,10 +191,13 @@ void mouse_clicked(int bouton, int x, int y)
 
 void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 {
+	printf("Recu key pressed\n");
+	saveGame();
 }
 // Initialise une structure jeu
 Jeu * initJeu(int taille)
 {
+	printf("Start to Initialise game \n");
 	Pion ** plateau= malloc(sizeof(Pion*)* taille * taille);
 	//Initialise le plateau pour chaque croisement
 	for(int i = 0;i < taille; i++)
@@ -196,7 +215,24 @@ Jeu * initJeu(int taille)
 	jeu->lastCoordNoir = initCoord(-2,-2);
 	jeu->taille = taille;
 	jeu->joueurCourant = NOIR;
+	jeu->isFinish = false;
+
 	return jeu;
+}
+
+DeroulementPartie* initDeroulementPartie()
+{
+	DeroulementPartie* deroulementPartie = malloc(sizeof(DeroulementPartie));
+	deroulementPartie->taillePlateau = jeu->taille;
+	deroulementPartie->nomJoueurBlanc = "Joueur blanc";
+	deroulementPartie->nomJoueurNoir = "Joueur noir";
+	deroulementPartie->listePionNoir = NULL; //pion noir pausé dans l'ordre
+	deroulementPartie->listePionBlanc = NULL; //pion blanc dans l'ordre
+	deroulementPartie->nbRound = 0; //nombre de round
+	deroulementPartie->result = "";
+	deroulementPartie->isFinish = false;
+
+	return deroulementPartie;
 }
 
 //Initialise un Pion
@@ -522,6 +558,11 @@ void fusionneChaineVoisine(Jeu * jeu, Pion * pion)
 	}
 }
 
+void saveGame(void)
+{
+	writePartyData("gameSave.sgf", deroulementPartie);
+}
+
 
 //Lance le jeu
 void game(int argc, char *argv[])
@@ -543,5 +584,6 @@ void game(int argc, char *argv[])
 	}
 	init_win(largeur,hauteur, "Jeu de GO",246,254,185);
 	jeu = initJeu(taillePlateau);
+	deroulementPartie = initDeroulementPartie();
   	event_loop();
 }

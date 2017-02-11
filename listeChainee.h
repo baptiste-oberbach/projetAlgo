@@ -21,6 +21,19 @@ typedef struct sList Liste;
 typedef struct PionDuPlateau Pion;
 typedef struct sNoeud Noeud;
 
+//sert a stocker les informations pour les avoir dans l'ordre pour sauvegarder la partie
+typedef struct DeroulementDeLaPartie
+{
+	int taillePlateau;
+	char* nomJoueurBlanc;
+	char* nomJoueurNoir;
+	Pion* listePionNoir; //pion noir pausé dans l'ordre
+	Pion* listePionBlanc; //pion blanc dans l'ordre
+	int nbRound; //nombre de round
+	bool isFinish; //sert a savoir si la partie est fini ou pas
+	char* result; //sert a stocker dans le fichier le resultat final
+}DeroulementPartie;
+
 struct PionDuPlateau {
  Couleur couleur;
  Liste * chaineLie;
@@ -33,6 +46,7 @@ typedef struct JeuDeGo {
  Pion ** plateau;
  int taille;
  Couleur joueurCourant;
+ bool isFinish;
 }Jeu;
 
 struct sNoeud

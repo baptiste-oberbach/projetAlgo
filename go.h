@@ -14,6 +14,7 @@ void mouse_clicked(int bouton, int x, int y);
 void key_pressed(KeySym code, char c, int x_souris, int y_souris);
 // Initialise une structure jeu
 Jeu * initJeu(int taille);
+DeroulementPartie* initDeroulementPartie(void);
 //Initialise un Pion
 Pion * initPion(Couleur couleur);
 Coord * initCoord(int x, int y);
@@ -30,7 +31,7 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove);
 void enleverPion(Jeu * jeu, Pion * pion);
 void enleverChaine(Jeu * jeu, Liste * liste);
 void fusionneChaineVoisine(Jeu * jeu,Pion * pion);
-
+void saveGame(void);
 //Lance le jeux
 void game(int argc, char *argv[]);
 
