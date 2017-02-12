@@ -161,6 +161,7 @@ void mouse_clicked(int bouton, int x, int y)
 				printf("Deux passage consécutif, fin du jeux \n");
 				//Pour nous, le jeu est terminé, passe cette variable a true pour que les prochains cliques soient gérer différements (pour qu'on puisse enlever les pions conflictuelles du plateau)
 				jeu->isFinish = true;
+				finirPartie(jeu);
 			}
 			else
 			{
@@ -563,6 +564,37 @@ void fusionneChaineVoisine(Jeu * jeu, Pion * pion)
 void saveGame(void)
 {
 	writePartyData("gameSave.sgf", deroulementPartie);
+}
+
+void finirPartie(Jeu * jeu)
+{
+	afficheScore(jeu);
+}
+
+void afficheScore(Jeu * jeu)
+{
+	int scoreBlanc = 7;
+	int scoreNoir = 0;
+	//Calcul du score
+	for(int i = 0; i< jeu->taille; i++)
+	{
+		for(int j = 0; j< jeu->taille; j++)
+		{
+			if(jeu->plateau[i * jeu->taille +j ]->couleur == BLANC)
+				scoreBlanc ++;
+			else if(jeu->plateau[i * jeu->taille +j ]->couleur == NOIR)
+				scoreNoir ++;
+		}
+	}
+	printf("Le score des noirs est de %d \n",scoreNoir);
+	printf("Le score des blancs est de %d,5 \n",scoreBlanc);
+	//Cas d'une victoire des noires
+	if(scoreNoir > scoreBlanc)
+		printf("Les noirs ont gagnés \n");
+	else
+	{
+		printf("Les blancs ont gagnés \n");
+	}
 }
 
 
