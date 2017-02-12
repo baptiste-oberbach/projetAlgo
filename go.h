@@ -32,6 +32,8 @@ void enleverPion(Jeu * jeu, Pion * pion);
 void enleverChaine(Jeu * jeu, Liste * liste);
 void fusionneChaineVoisine(Jeu * jeu,Pion * pion);
 void saveGame(void);
+void finirPartie(Jeu * jeu);
+void afficheScore(Jeu * jeu);
 //Lance le jeux
 void game(int argc, char *argv[]);
 
