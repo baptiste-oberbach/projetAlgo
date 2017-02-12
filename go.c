@@ -226,8 +226,8 @@ DeroulementPartie* initDeroulementPartie()
 	deroulementPartie->taillePlateau = jeu->taille;
 	deroulementPartie->nomJoueurBlanc = "Joueur blanc";
 	deroulementPartie->nomJoueurNoir = "Joueur noir";
-	deroulementPartie->listePionNoir = NULL; //pion noir pausé dans l'ordre
-	deroulementPartie->listePionBlanc = NULL; //pion blanc dans l'ordre
+	deroulementPartie->listePionNoir = liste_vide(); //pion noir pausé dans l'ordre
+	deroulementPartie->listePionBlanc = liste_vide(); //pion blanc dans l'ordre
 	deroulementPartie->nbRound = 0; //nombre de round
 	deroulementPartie->result = "";
 	deroulementPartie->isFinish = false;
@@ -289,17 +289,6 @@ int nbDegreLiberteChaine(Jeu * jeu,Liste liste)
 		noeud = noeud->next;
 	}
 	return res;
-	/*
-	while(noeud != liste.last)
-	{
-		res += nbDegreLibertePion(jeu,noeud->pion);
-		noeud = noeud->next;
-	}
-	if(liste.nb == 1)
-	{
-		res+= nbDegreLibertePion(jeu,noeud->pion);
-	}
-	return res;*/
 }
 
 bool isAuthorizedSense(Jeu * jeu, Pion * adjacentPion)
@@ -413,6 +402,19 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 	fusionneChaineVoisine(jeu, pion);
 	print(selfChaine);
 	jeu->plateau[coord->x + coord->y * jeu->taille] = pion;
+
+	//une fois le pion ajouté au jeu, on l'ajoute dans le deroulement de la partie
+	if(couleur == NOIR)
+	{
+		push_back(deroulementPartie->listePionNoir, pion);
+	}
+	else if(couleur == BLANC)
+	{
+		push_back(deroulementPartie->listePionBlanc, pion);
+	}
+	
+
+
 	Pion * adjacentPion;
 	//Regarde si une chaine adjacente ennemie est capturé
 	//check la case au dessus
