@@ -77,7 +77,6 @@ void draw_win()
 	{
 		for(int j = 0; j < jeu->taille; j++)
 		{
-			printf("i %d * taillePlateau %d + j %d\n", i, jeu->taille, j);
 			//Si il existe un pion sur ce croisement
 			if(jeu->plateau[i*jeu->taille+j]->couleur != VIDE)
 			{

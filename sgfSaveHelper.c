@@ -50,21 +50,15 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 			//On veut la chaine de caractere entre les delimiters, du coup on a plus
 			//qu'a pousser notre pointeur d'autant de caractere que compose le startDemiliter (pour l'exemple ici ca sera 3)
 			int sizeToPush = strlen(startDelimiter);
-			printf("Len de startDelimiter : %d\n", sizeToPush);
 			int positionPushed = searchingPart - (searchingPart+sizeToPush);
-			printf("position pushed %d\n", positionPushed);
-			printf("substringLength %d\n", substringLength);
 			int finalResultLength = substringLength + positionPushed;
-			printf("finalResultLength %d\n", finalResultLength);
 
 			finalResult = malloc(finalResultLength*sizeof(char));
 			//du coup on va pouvoir enfin avoir notre resultat (youhou)
-			printf("Le malloc est fait\n");
 
 			strncpy(finalResult, searchingPart+sizeToPush, finalResultLength);
 
 			//ici avec notre exemple on aura finalResult = "19"
-			printf("finalResult %s", finalResult);
 		}
 
 	}
@@ -85,8 +79,13 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 	{
 		//traitement du fichier, on va chercher les mots clés
 		int sz = 0;
+		int nbRound = 0;
+		char* nomJoueurBlanc;
+		char* nomJoueurNoir;
+		bool pb = false; //boolean qui sert a savoir si on a deja récupéré le nom du joueur noir
+		bool pw = false; //pareil pour le joueur blanc
 
-		char buffer[256];
+		char buffer[496];
 	    char *input = 0;
 	    size_t cur_len = 0;
 
@@ -107,22 +106,122 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 	        if(sz == 0)
 	        {
 	        	char* size = searchValueInBuffer(buffer, buf_len, "SZ[", "]");
-	        	printf("final size : %s\n", size);
+	        	
 	        	if(size != NULL)
 	        	{
-							int sizeInt = atoi(size);
-							printf("sizeInt %d \n", sizeInt);
-	        		*jeu = initJeu(sizeInt);
-	        		printf("jeu : taille %d\n", (*jeu)->taille);
-							printf("jeu : joeuurCourant %d, \n",(*jeu)->joueurCourant);
-	        		printf("Start to initialize the party\n");
-							*deroulementPartie = initDeroulementPartie(*jeu);
-							printf("apres deroulement party\n");
-							break;
+					sz = atoi(size);
+					printf("final sz %d \n", sz);
+	        		*jeu = initJeu(sz);
+
+					*deroulementPartie = initDeroulementPartie(*jeu);
+							
 	        	}
 
 	        }
-        	//sinon on recherche les autres valeurs dont on a besoin dans le fichier
+
+	        //recheck pour 0 parce qu'on a pu changer la taille à la condition d'avant
+	        if(sz != 0) //on recherche les autres valeurs dont on a besoin dans le fichier
+	        {
+	        	//si on a pas encore remplit le nombre de round
+	        	if(nbRound == 0)
+	        	{
+	        		//essaye d'avoir le nombre de round pour savoir combien de fois on va jouer
+		        	char* nbRoundStr = searchValueInBuffer(buffer, buf_len, "RO[", "]");
+
+		        	if(nbRoundStr != NULL)
+		        	{
+		        		nbRound = atoi(nbRoundStr);
+			        	printf("nb round du fichier : %d\n", nbRound);
+
+		        	}
+	        	}
+
+	        	//cherche a avoir le nom des joueurs blancs et noir (et fera avancer notre buffer pour pas avoir de bug dans notre detection des coups (sinon il detectait PB[nomjoueur] comme un B[....]))
+	        	if(nbRound != 0 && (!pb || !pw))
+	        	{
+	        		printf("Cherche le nom des joueurs \n");
+	        		//PB[Joueur noir]
+					//PW[Joueur blanc]
+					nomJoueurBlanc = searchValueInBuffer(buffer, buf_len, "PW[", "]");
+        			if(nomJoueurBlanc != NULL)
+        			{
+        				(*deroulementPartie)->nomJoueurBlanc = nomJoueurBlanc;
+        				pw = true;
+        			}
+
+        			nomJoueurNoir = searchValueInBuffer(buffer, buf_len, "PB[", "]");
+        			if(nomJoueurNoir != NULL)
+        			{
+						(*deroulementPartie)->nomJoueurNoir = nomJoueurNoir;
+						pb = true;
+        			}
+	        	}
+	        	
+	        	if(nbRound != 0 && pb && pw) //si on a remplit le nombre de round on va pouvoir chercher les coups et remplir le plateau
+	        	{
+	        		printf("Cherche des tours \n");
+	        		char* tour;
+        		 	const int nbCaractereForOneTour = 5;
+        		 	char* partyOfCurrentLine; //infos qui nous restent a traiter dans notre buffer
+
+	        		int nbPossibleTourInThisLine = buf_len / nbCaractereForOneTour; //Exemple B[ac]W[jf] <- va permettre de sauter de 5 caractères a chaque fois
+	        		
+	        		printf("nbPossibleTourInThisLine %d\n", nbPossibleTourInThisLine);
+	        		//va permettre de jouer tous les tours contenu dans la ligne du buffer courant
+	        		for (int i = 0; i < nbPossibleTourInThisLine; ++i)
+	        		 {
+	        		 	printf("rentre dans la boucle pour i = %d\n", i);
+						int positionOfSubstring = buffer - (buffer+nbCaractereForOneTour*i); //on pousse de 5 case notre pointeur autant de fois qu'il faut 
+						int tailleDuSubString = buf_len - positionOfSubstring;
+
+						partyOfCurrentLine = malloc(tailleDuSubString*sizeof(char));
+
+						//buffer-positionOfSubstring car positionOfSubstring est négatif
+						strncpy(partyOfCurrentLine, buffer-positionOfSubstring, tailleDuSubString);
+
+						printf("partyOfCurrentLine %s\n", partyOfCurrentLine);
+
+	        		 	if((*jeu)->joueurCourant == NOIR){
+	        				tour = searchValueInBuffer(partyOfCurrentLine, tailleDuSubString, "B[", "]"); //retourne quelque chose genre ab qui sont les coordonnées xy
+	        				if(tour != NULL)
+	        				{
+	        					//si on est ici c'est que l'on a trouvé une ligne parlant de coup a jouer, et qu'on a vu une partie noir
+	        					printf("tour NOIR  %s\n", tour);
+	        					printf("x : %d\n", tour[0]-'a');
+	        					printf("y : %d\n", tour[1]-'a');
+	        					int x = tour[0] - 'a';
+	        					int y = tour[1] - 'a';
+	        					Coord* coord = initCoord(x ,y);
+	        					//tour comprends les coordonnées sous forme de lettre comme ac
+	        					//on doit maintenant faire jouer le coup
+	        					playMoove(*jeu, coord, NOIR);
+	        					draw_win();
+	        				}
+		        			
+		        		}
+		        		
+		        		if((*jeu)->joueurCourant == BLANC)//sinon il est blanc
+		        		{
+		        			tour = searchValueInBuffer(partyOfCurrentLine, tailleDuSubString, "W[", "]");
+		        			if(tour != NULL)
+		        			{
+		        				printf("tour BLANC  %s\n", tour);
+	        					printf("x : %d\n", tour[0]-'a');
+	        					printf("y : %d\n", tour[1]-'a');
+		        				int x = tour[0] - 'a';
+	        					int y = tour[1] - 'a';
+	        					Coord* coord = initCoord(x ,y);
+		        				playMoove(*jeu, coord, BLANC);
+		        				draw_win();
+		        			}
+		        		}
+
+		        		
+	        		 } 
+	        		
+	        	}
+	        }
+        	
 
 
 
