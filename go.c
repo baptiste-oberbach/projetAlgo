@@ -192,8 +192,16 @@ void mouse_clicked(int bouton, int x, int y)
 
 void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 {
-	printf("Recu key pressed\n");
-	saveGame();
+	
+	switch(c)
+	{
+		case 'S':
+		case 's':
+			saveGame();
+			break;
+
+	}
+	
 }
 // Initialise une structure jeu
 Jeu * initJeu(int taille)
@@ -224,14 +232,23 @@ Jeu * initJeu(int taille)
 DeroulementPartie* initDeroulementPartie()
 {
 	DeroulementPartie* deroulementPartie = malloc(sizeof(DeroulementPartie));
+	printf("Apres malloc ?\n");
+	printf("jeu->taille %d\n", jeu->taille);
 	deroulementPartie->taillePlateau = jeu->taille;
+	printf("deroulementPartie->taillePlateau %d \n", deroulementPartie->taillePlateau);
 	deroulementPartie->nomJoueurBlanc = "Joueur blanc";
+	printf("deroulementPartie->nomJoueurBlanc %s\n", deroulementPartie->nomJoueurBlanc);
 	deroulementPartie->nomJoueurNoir = "Joueur noir";
+	printf("deroulementPartie->nomJoueurNoir %s\n", deroulementPartie->nomJoueurNoir);
 	deroulementPartie->listePionNoir = liste_vide(); //pion noir pausé dans l'ordre
 	deroulementPartie->listePionBlanc = liste_vide(); //pion blanc dans l'ordre
+	printf("apres init des listes\n");
 	deroulementPartie->nbRound = 0; //nombre de round
+	printf("deroulementPartie->nbRound %d\n", deroulementPartie->nbRound);
 	deroulementPartie->result = "";
+	printf("deroulementPartie->result %s\n", deroulementPartie->result);
 	deroulementPartie->isFinish = false;
+	printf("deroulementPartie->isFinish %s\n", deroulementPartie->isFinish);
 
 	return deroulementPartie;
 }
@@ -413,7 +430,7 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 	{
 		push_back(deroulementPartie->listePionBlanc, pion);
 	}
-	
+	deroulementPartie->nbRound += 1;
 
 
 	Pion * adjacentPion;
@@ -603,6 +620,8 @@ void game(int argc, char *argv[])
 {
 	int largeur = 700;
 	int hauteur = 700;
+	bool loadPreviousGame = false;
+	char* fileName;
 	for(int i =1;i<argc;i+=2)
 	{
 		// Si l'argument est -largeur
@@ -615,9 +634,32 @@ void game(int argc, char *argv[])
 		{
 			hauteur = atoi(argv[i+1]);
 		}
+
+		//si on veut charger un fichier
+		if(strcmp(argv[i],"-load") == 0)
+		{
+			printf("Loading\n");
+			loadPreviousGame = true;
+			fileName = argv[i+1];
+		}
 	}
+
 	init_win(largeur,hauteur, "Jeu de GO",246,254,185);
-	jeu = initJeu(taillePlateau);
-	deroulementPartie = initDeroulementPartie();
-  	event_loop();
+
+	//si on doit charger une partie existante
+	if(loadPreviousGame)
+	{
+		printf("Starting load function \n");
+		//filename = saveGame.sgf;
+		loadPartyData(fileName, &jeu, &deroulementPartie);
+	}
+	else
+	{
+		
+		jeu = initJeu(taillePlateau);
+		deroulementPartie = initDeroulementPartie();
+  	
+	}
+	event_loop();
+	
 }

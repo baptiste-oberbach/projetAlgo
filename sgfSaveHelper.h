@@ -1,6 +1,7 @@
 #ifndef sgfSaveHelper_h
 #define sgfSaveHelper_h
 
+char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, char* endDelimiter);
 void writePartyData(char* fileName, DeroulementPartie* deroulementPartie);
 void writeFileBeginning(FILE* fp);
 void writeFileFormat(FILE* fp);
@@ -19,5 +20,7 @@ void writeWriterName(FILE* fp);
 void writeBlackMoove(FILE* fp, int xCoord, int yCoord);
 void writeWhiteMoove(FILE* fp, int xCoord, int yCoord);
 void writeEndFile(FILE* fp);
+void loadPartyData(char* fileName, Jeu* jeu, DeroulementPartie* deroulementPartie);
+
 
 #endif /* sgfSaveHelper_h */
