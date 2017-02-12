@@ -129,6 +129,9 @@ void mouse_clicked(int bouton, int x, int y)
 			// Cas des bords du tableau
 			posX = posX<0 ? 0 :posX;
 			posY = posY<0 ? 0 :posY;
+			printf(" x : %d y %d \n",posX,posY);
+			posX = posX>jeu->taille-1 ? jeu->taille-1 :posX;
+			posY = posY>jeu->taille-1 ? jeu->taille-1 :posY;
 
 			Coord * coord = initCoord(posX,posY);
 
@@ -322,7 +325,7 @@ bool isAuthorizedSense(Jeu * jeu, Pion * adjacentPion)
 		//Check si chaine à coté à un degré de liberté > 1
 		int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 		printf("la chaine à %d degré de liberté\n", nbDegre);
-		if(nbDegre > 1)
+		if(nbDegre > 0)
 		{
 			return true;
 		}
@@ -366,6 +369,7 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		return false;
 	}
 	printf("future moove x:%d y:%d \n",futurMoove.x,futurMoove.y);
+	jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = jeu->joueurCourant;
 	Pion  * adjacentPion;
 	//cas d'une cases adjacente vide et n'étant pas le bord => on peux placer le pion
 
@@ -375,6 +379,7 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		adjacentPion = jeu->plateau[(futurMoove.y-1)*jeu->taille + futurMoove.x];
 		if(isAuthorizedSense(jeu, adjacentPion))
 		{
+			jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
 			return true;
 		}
 	}
@@ -384,6 +389,7 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		adjacentPion = jeu->plateau[(futurMoove.y+1)*jeu->taille + futurMoove.x];
 		if(isAuthorizedSense(jeu, adjacentPion))
 		{
+			jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
 			return true;
 		}
 	}
@@ -393,6 +399,7 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		adjacentPion = jeu->plateau[(futurMoove.y)*jeu->taille + futurMoove.x-1];
 		if(isAuthorizedSense(jeu, adjacentPion))
 		{
+			jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
 			return true;
 		}
 	}
@@ -403,9 +410,11 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		adjacentPion = jeu->plateau[(futurMoove.y)*jeu->taille + futurMoove.x+1];
 		if(isAuthorizedSense(jeu, adjacentPion))
 		{
+			jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
 			return true;
 		}
 	}
+	jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
 	return false;
 }
 
