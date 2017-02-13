@@ -435,14 +435,22 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 	print(selfChaine);
 	jeu->plateau[coord->x + coord->y * jeu->taille] = pion;
 
+	//copie pion courant -> besoin pour la sauvegarde car les pions de notre plateau peuvent être supprimé de la mémoire si ils sont pris
+	//du coup on fait une copie qui sera seulement dans la liste de deroulement de la partie
+	Pion* copiePionCourant = initPion(couleur);
+	copiePionCourant->chaineLie = liste_vide();
+	copiePionCourant->coord = initCoord(coord->x, coord->y);
+	printf("Copie pion courant %d couleur\n", copiePionCourant->couleur);
+	printf("x %d y %d\n", copiePionCourant->coord->x, copiePionCourant->coord->y);
+
 	//une fois le pion ajouté au jeu, on l'ajoute dans le deroulement de la partie
 	if(couleur == NOIR)
 	{
-		push_back(deroulementPartie->listePionNoir, pion);
+		push_back(deroulementPartie->listePionNoir, copiePionCourant);
 	}
 	else if(couleur == BLANC)
 	{
-		push_back(deroulementPartie->listePionBlanc, pion);
+		push_back(deroulementPartie->listePionBlanc, copiePionCourant);
 	}
 	deroulementPartie->nbRound += 1;
 

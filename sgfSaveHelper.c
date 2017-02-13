@@ -110,7 +110,6 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 	        	if(size != NULL)
 	        	{
 					sz = atoi(size);
-					printf("final sz %d \n", sz);
 	        		*jeu = initJeu(sz);
 
 					*deroulementPartie = initDeroulementPartie(*jeu);
@@ -131,7 +130,6 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 		        	if(nbRoundStr != NULL)
 		        	{
 		        		nbRound = atoi(nbRoundStr);
-			        	printf("nb round du fichier : %d\n", nbRound);
 
 		        	}
 	        	}
@@ -139,7 +137,6 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 	        	//cherche a avoir le nom des joueurs blancs et noir (et fera avancer notre buffer pour pas avoir de bug dans notre detection des coups (sinon il detectait PB[nomjoueur] comme un B[....]))
 	        	if(nbRound != 0 && (!pb || !pw))
 	        	{
-	        		printf("Cherche le nom des joueurs \n");
 	        		//PB[Joueur noir]
 					//PW[Joueur blanc]
 					nomJoueurBlanc = searchValueInBuffer(buffer, buf_len, "PW[", "]");
@@ -159,18 +156,15 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 	        	
 	        	if(nbRound != 0 && pb && pw) //si on a remplit le nombre de round on va pouvoir chercher les coups et remplir le plateau
 	        	{
-	        		printf("Cherche des tours \n");
 	        		char* tour;
         		 	const int nbCaractereForOneTour = 5;
         		 	char* partyOfCurrentLine; //infos qui nous restent a traiter dans notre buffer
 
 	        		int nbPossibleTourInThisLine = buf_len / nbCaractereForOneTour; //Exemple B[ac]W[jf] <- va permettre de sauter de 5 caractères a chaque fois
 	        		
-	        		printf("nbPossibleTourInThisLine %d\n", nbPossibleTourInThisLine);
 	        		//va permettre de jouer tous les tours contenu dans la ligne du buffer courant
 	        		for (int i = 0; i < nbPossibleTourInThisLine; ++i)
 	        		 {
-	        		 	printf("rentre dans la boucle pour i = %d\n", i);
 						int positionOfSubstring = buffer - (buffer+nbCaractereForOneTour*i); //on pousse de 5 case notre pointeur autant de fois qu'il faut 
 						int tailleDuSubString = buf_len - positionOfSubstring;
 
@@ -422,7 +416,7 @@ void writeRule(FILE* fp)
 void writeKomi(FILE* fp)
 {
 	//default komi
-	fputs("KM[6.5]\n", fp);
+	fputs("KM[7.5]\n", fp);
 }
 
 //RE: Result: result, usually in the format "B+R" (Black wins by resign) or "B+3.5" (black wins by 3.5 moku).
@@ -443,6 +437,7 @@ void writeWriterName(FILE* fp)
 //B: a move by Black at the location specified by the property value.
 void writeBlackMoove(FILE* fp, int xCoord, int yCoord)
 {
+	printf("Write blackmoove : x : %d, y : %d\n", xCoord, yCoord);
 	char xLetterCoord = 'a';
 	char yLetterCoord = 'a';
 
@@ -459,6 +454,8 @@ void writeBlackMoove(FILE* fp, int xCoord, int yCoord)
 // W: a move by White at the location specified by the property value.
 void writeWhiteMoove(FILE* fp, int xCoord, int yCoord)
 {
+	printf("Write whitemoove : x : %d, y : %d\n", xCoord, yCoord);
+
 	char xLetterCoord = 'a';
 	char yLetterCoord = 'a';
 
