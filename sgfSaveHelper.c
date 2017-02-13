@@ -183,88 +183,73 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 
 						printf("Joueur courant : %d\n", (*jeu)->joueurCourant);
 	        		 	if((*jeu)->joueurCourant == NOIR){
-	        				tour = searchValueInBuffer(partyOfCurrentLine, tailleDuSubString, "B[", "]"); //retourne quelque chose genre ab qui sont les coordonnées xy
-	        				if(tour != NULL)
-	        				{
-	        					//si on est ici c'est que l'on a trouvé une ligne parlant de coup a jouer, et qu'on a vu une partie noir
-	        					printf("tour NOIR  %s\n", tour);
-	        					printf("x : %d\n", tour[0]-'a');
-	        					printf("y : %d\n", tour[1]-'a');
-	        					int x = tour[0] - 'a';
-	        					int y = tour[1] - 'a';
-	        					Coord* coord = initCoord(x ,y);
-	        					//tour comprends les coordonnées sous forme de lettre comme ac
-	        					//on doit maintenant faire jouer le coup
-	        					playMoove(*jeu, coord, NOIR);
-								(*jeu)->lastCoordNoir = coord;
-								(*jeu)->joueurCourant = BLANC;
-							
-	        					draw_win();
-	        				}
-		        			
-		        		}
-		        		
-		        		if((*jeu)->joueurCourant == BLANC)//sinon il est blanc
-		        		{
-		        			tour = searchValueInBuffer(partyOfCurrentLine, tailleDuSubString, "W[", "]");
-		        			if(tour != NULL)
+	        		 		if(partyOfCurrentLine[0] == 'W')
 		        			{
-		        				printf("tour BLANC  %s\n", tour);
-	        					printf("x : %d\n", tour[0]-'a');
-	        					printf("y : %d\n", tour[1]-'a');
-		        				int x = tour[0] - 'a';
-	        					int y = tour[1] - 'a';
-	        					Coord* coord = initCoord(x ,y);
-		        				playMoove(*jeu, coord, BLANC);
-		        				(*jeu)->lastCoordBlanc = coord;
-								(*jeu)->joueurCourant = NOIR;
-		        				draw_win();
+		        				//le joueur a passé son tour
+		        				printf("Le joueur noir passe son tour\n");
+		        				passe(*jeu);
+		        				i--;
+		        			}
+		        			else
+		        			{
+		        				tour = searchValueInBuffer(partyOfCurrentLine, tailleDuSubString, "B[", "]"); //retourne quelque chose genre ab qui sont les coordonnées xy
+		        				if(tour != NULL)
+		        				{
+		        					//si on est ici c'est que l'on a trouvé une ligne parlant de coup a jouer, et qu'on a vu une partie noir
+		        					printf("tour NOIR  %s\n", tour);
+		        					printf("x : %d\n", tour[0]-'a');
+		        					printf("y : %d\n", tour[1]-'a');
+		        					int x = tour[0] - 'a';
+		        					int y = tour[1] - 'a';
+		        					Coord* coord = initCoord(x ,y);
+		        					//tour comprends les coordonnées sous forme de lettre comme ac
+		        					//on doit maintenant faire jouer le coup
+		        					playMoove(*jeu, coord, NOIR);
+								
+		        					draw_win();
+		        				}
+		        			}
+		        			
+		        		}else if((*jeu)->joueurCourant == BLANC)//sinon il est blanc
+		        		{
+		        			printf("TOUR BLANC \n");
+
+		        			//check si le joueur a pas passé son tour
+		        			if(partyOfCurrentLine[0] == 'B')
+		        			{
+		        				//le joueur a passé son tour
+		        				printf("Le joueur blanc passe son tour\n");
+		        				passe(*jeu);
+		        				i--;
+		        			}
+		        			else
+		        			{
+
+		        				tour = searchValueInBuffer(partyOfCurrentLine, tailleDuSubString, "W[", "]");
+			        			if(tour != NULL)
+			        			{
+			        				printf("tour BLANC  %s\n", tour);
+		        					printf("x : %d\n", tour[0]-'a');
+		        					printf("y : %d\n", tour[1]-'a');
+			        				int x = tour[0] - 'a';
+		        					int y = tour[1] - 'a';
+		        					Coord* coord = initCoord(x ,y);
+			        				playMoove(*jeu, coord, BLANC);
+			        				draw_win();
+			        			}
 		        			}
 		        		}
-
-		        		
-	        		 } 
+	
+	        		}
 	        		
 	        	}
 	        }
-        	
-
-
-
-
-
 
 	    }
-	    printf("Avant free input ?\n");
-	    //printf("%s [%d]", input, (int)strlen(input));
 	    free(input);
 
-			/*init_win(largeur,hauteur, "Jeu de GO",246,254,185);
-			jeu = initJeu(SZ);
-			deroulementPartie = initDeroulementPartie();*/
-
-
-		/*
-		//parcours tous notre fichier et joue chaque coup
-		Coord * coord = initCoord(posX,posY);
-
-
-		playMoove(jeu,coord,jeu->joueurCourant);
-		if(jeu->joueurCourant == BLANC)
-		{
-			jeu->lastCoordBlanc = coord;
-			jeu->joueurCourant = NOIR;
-		}
-		else
-		{
-			jeu->lastCoordNoir = coord;
-			jeu->joueurCourant = BLANC;
-		}*/
 	}
-	printf("avant close fichier ?\n");
 	fclose(fp);
-	//draw la fenetre a la fin
-	//draw_win();
 }
 
 void writePartyData(char* fileName, DeroulementPartie* deroulementPartie)
