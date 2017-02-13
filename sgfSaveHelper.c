@@ -181,6 +181,7 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 
 						printf("partyOfCurrentLine %s\n", partyOfCurrentLine);
 
+						printf("Joueur courant : %d\n", (*jeu)->joueurCourant);
 	        		 	if((*jeu)->joueurCourant == NOIR){
 	        				tour = searchValueInBuffer(partyOfCurrentLine, tailleDuSubString, "B[", "]"); //retourne quelque chose genre ab qui sont les coordonnées xy
 	        				if(tour != NULL)
@@ -195,6 +196,9 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 	        					//tour comprends les coordonnées sous forme de lettre comme ac
 	        					//on doit maintenant faire jouer le coup
 	        					playMoove(*jeu, coord, NOIR);
+								(*jeu)->lastCoordNoir = coord;
+								(*jeu)->joueurCourant = BLANC;
+							
 	        					draw_win();
 	        				}
 		        			
@@ -212,6 +216,8 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 	        					int y = tour[1] - 'a';
 	        					Coord* coord = initCoord(x ,y);
 		        				playMoove(*jeu, coord, BLANC);
+		        				(*jeu)->lastCoordBlanc = coord;
+								(*jeu)->joueurCourant = NOIR;
 		        				draw_win();
 		        			}
 		        		}
