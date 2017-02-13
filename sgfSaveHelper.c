@@ -39,11 +39,30 @@ void writePartyData(char* fileName, DeroulementPartie* deroulementPartie)
 		//end header
 
 		//parcours tous les pions noirs | nbCoupPionNoir > nbCoupPionBlanc
-		/*while(deroulementPartie->listePionNoir->next != NULL)
+		if(deroulementPartie->listePionNoir->first != NULL)
 		{
-			writeBlackMoove(fp, listePionNoir->pion->coord->x, listePionNoir->pion->coord->y);
-			writeWhiteMoove(fp, listePionBlanc->pion->coord->x, listePionBlanc->pion->coord->y);
-		}*/
+			//Fait un pointeur pour qu'on puisse parcourir toute notre liste
+			Noeud* noeudCourrantNoir = deroulementPartie->listePionNoir->first;
+			Noeud* noeudCourrantBlanc = deroulementPartie->listePionBlanc->first;
+			while(noeudCourrantNoir != NULL)
+			{
+				if(noeudCourrantNoir != NULL)
+				{
+					writeBlackMoove(fp, noeudCourrantNoir->pion->coord->x, noeudCourrantNoir->pion->coord->y);
+					noeudCourrantNoir = noeudCourrantNoir->next;
+				}
+				
+				if(noeudCourrantBlanc != NULL)
+				{
+					writeWhiteMoove(fp, noeudCourrantBlanc->pion->coord->x, noeudCourrantBlanc->pion->coord->y);
+					noeudCourrantBlanc = noeudCourrantBlanc->next;
+				}
+				
+			}
+			free(noeudCourrantNoir);
+			free(noeudCourrantBlanc);
+
+		}
 
 		writeEndFile(fp);
 
@@ -183,7 +202,7 @@ void writeBlackMoove(FILE* fp, int xCoord, int yCoord)
 	xLetterCoord += xCoord;
 	yLetterCoord += yCoord;
 
-	fputs("B|", fp);
+	fputs("B[", fp);
 	fprintf(fp, "%c", xLetterCoord);
 	fprintf(fp, "%c", yLetterCoord);
 	fputs("]", fp);
@@ -199,7 +218,7 @@ void writeWhiteMoove(FILE* fp, int xCoord, int yCoord)
 	xLetterCoord += xCoord;
 	yLetterCoord += yCoord;
 
-	fputs("W|", fp);
+	fputs("W[", fp);
 	fprintf(fp, "%c", xLetterCoord);
 	fprintf(fp, "%c", yLetterCoord);
 	fputs("]", fp);
@@ -207,5 +226,5 @@ void writeWhiteMoove(FILE* fp, int xCoord, int yCoord)
 
 void writeEndFile(FILE* fp)
 {
-	fputs(")", fp);
+	fputs("\n)", fp);
 }
