@@ -131,7 +131,7 @@ void mouse_clicked(int bouton, int x, int y)
 			// Cas des bords du tableau
 			posX = posX<0 ? 0 :posX;
 			posY = posY<0 ? 0 :posY;
-			printf(" x : %d y %d \n",posX,posY);
+			//printf(" x : %d y %d \n",posX,posY);
 			posX = posX>jeu->taille-1 ? jeu->taille-1 :posX;
 			posY = posY>jeu->taille-1 ? jeu->taille-1 :posY;
 
@@ -187,7 +187,7 @@ void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 // Initialise une structure jeu
 Jeu * initJeu(int taille)
 {
-	printf("Start to Initialise game \n");
+	//printf("Start to Initialise game \n");
 	Pion ** plateau= malloc(sizeof(Pion*)* taille * taille);
 	//Initialise le plateau pour chaque croisement
 	for(int i = 0;i < taille; i++)
@@ -213,23 +213,14 @@ Jeu * initJeu(int taille)
 DeroulementPartie* initDeroulementPartie(Jeu * jeu)
 {
 	DeroulementPartie* deroulementPartie = malloc(sizeof(DeroulementPartie));
-	printf("Apres malloc ?\n");
-	printf("jeu->taille %d\n", jeu->taille);
 	deroulementPartie->taillePlateau = jeu->taille;
-	printf("deroulementPartie->taillePlateau %d \n", deroulementPartie->taillePlateau);
 	deroulementPartie->nomJoueurBlanc = "Joueur blanc";
-	printf("deroulementPartie->nomJoueurBlanc %s\n", deroulementPartie->nomJoueurBlanc);
 	deroulementPartie->nomJoueurNoir = "Joueur noir";
-	printf("deroulementPartie->nomJoueurNoir %s\n", deroulementPartie->nomJoueurNoir);
 	deroulementPartie->listePionNoir = liste_vide(); //pion noir pausé dans l'ordre
 	deroulementPartie->listePionBlanc = liste_vide(); //pion blanc dans l'ordre
-	printf("apres init des listes\n");
 	deroulementPartie->nbRound = 0; //nombre de round
-	printf("deroulementPartie->nbRound %d\n", deroulementPartie->nbRound);
 	deroulementPartie->result = "";
-	printf("deroulementPartie->result %s\n", deroulementPartie->result);
 	deroulementPartie->isFinish = false;
-	printf("deroulementPartie->isFinish %d\n", deroulementPartie->isFinish);
 
 	return deroulementPartie;
 }
@@ -253,7 +244,7 @@ Coord * initCoord(int x, int y)
 int nbDegreLibertePion(Jeu * jeu, Pion * pion)
 {
 	int res = 0;
-	printf("check degre liberte du pion x:%d y:%d\n",pion->coord->x, pion->coord->y );
+	//printf("check degre liberte du pion x:%d y:%d\n",pion->coord->x, pion->coord->y );
 //	printf("pion coord y %d taille %d pion coord y %d \n",pion->coord->y, );
 	//Check la case au dessus
 	if(pion->coord->y != 0 && jeu->plateau[(pion->coord->y-1)*jeu->taille + pion->coord->x]->couleur == VIDE)
@@ -302,7 +293,7 @@ bool isAuthorizedSense(Jeu * jeu, Pion * adjacentPion)
 	{
 		//Check si chaine à coté à un degré de liberté > 1
 		int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
-		printf("la chaine à %d degré de liberté\n", nbDegre);
+		//printf("la chaine à %d degré de liberté\n", nbDegre);
 		if(nbDegre > 0)
 		{
 			return true;
@@ -312,7 +303,7 @@ bool isAuthorizedSense(Jeu * jeu, Pion * adjacentPion)
 	else
 	{
 		int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
-		printf("la chaine à %d degré de liberté\n", nbDegre);
+		//printf("la chaine à %d degré de liberté\n", nbDegre);
 		if(nbDegre < 1)
 		{
 			return true;
@@ -346,7 +337,7 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		//deja un pion sur cette case, pas le droit de faire ca
 		return false;
 	}
-	printf("future moove x:%d y:%d \n",futurMoove.x,futurMoove.y);
+	//printf("future moove x:%d y:%d \n",futurMoove.x,futurMoove.y);
 	jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = jeu->joueurCourant;
 	Pion  * adjacentPion;
 	//cas d'une cases adjacente vide et n'étant pas le bord => on peux placer le pion
@@ -388,13 +379,13 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		adjacentPion = jeu->plateau[(futurMoove.y)*jeu->taille + futurMoove.x+1];
 		if(isAuthorizedSense(jeu, adjacentPion))
 		{
-			printf("couleur joueur %d, couleur adjacent %d\n", jeu->joueurCourant, adjacentPion->couleur);
+			//printf("couleur joueur %d, couleur adjacent %d\n", jeu->joueurCourant, adjacentPion->couleur);
 			jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
 			return true;
 		}
 	}
 	jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
-	printf("Pas auth \n");
+	//printf("Pas auth \n");
 	return false;
 }
 
@@ -434,7 +425,7 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 	push_front(selfChaine, pion); //met le pion dedans
 	pion->chaineLie = selfChaine;
 	fusionneChaineVoisine(jeu, pion);
-	print(selfChaine);
+	//print(selfChaine);
 	jeu->plateau[coord->x + coord->y * jeu->taille] = pion;
 
 	//copie pion courant -> besoin pour la sauvegarde car les pions de notre plateau peuvent être supprimé de la mémoire si ils sont pris
@@ -442,8 +433,8 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 	Pion* copiePionCourant = initPion(couleur);
 	copiePionCourant->chaineLie = liste_vide();
 	copiePionCourant->coord = initCoord(coord->x, coord->y);
-	printf("Copie pion courant %d couleur\n", copiePionCourant->couleur);
-	printf("x %d y %d\n", copiePionCourant->coord->x, copiePionCourant->coord->y);
+	//printf("Copie pion courant %d couleur\n", copiePionCourant->couleur);
+	//printf("x %d y %d\n", copiePionCourant->coord->x, copiePionCourant->coord->y);
 
 	//une fois le pion ajouté au jeu, on l'ajoute dans le deroulement de la partie
 	if(couleur == NOIR)
@@ -466,10 +457,10 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 		//Test seulement si le pion du dessus est de la couleur opposé
 		if(adjacentPion->couleur != VIDE && adjacentPion->couleur != jeu->joueurCourant)
 		{
-			printf("Check de la chaine : ");
-			print(adjacentPion->chaineLie);
+			//printf("Check de la chaine : ");
+			//print(adjacentPion->chaineLie);
 			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
-			printf("il y a %d degré de liberté \n", nbDegre);
+			//printf("il y a %d degré de liberté \n", nbDegre);
 			if(nbDegre == 0)
 			{
 				enleverChaine(jeu,adjacentPion->chaineLie);
@@ -482,10 +473,10 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 		adjacentPion = jeu->plateau[(coord->y+1)*jeu->taille + coord->x];
 		if(adjacentPion->couleur != VIDE && adjacentPion->couleur != jeu->joueurCourant)
 		{
-			printf("Check de la chaine : ");
-			print(adjacentPion->chaineLie);
+			//printf("Check de la chaine : ");
+			//print(adjacentPion->chaineLie);
 			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
-			printf("il y a %d degré de liberté \n", nbDegre);
+			//printf("il y a %d degré de liberté \n", nbDegre);
 			if(nbDegre == 0)
 			{
 				//Capture
@@ -499,10 +490,10 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 		adjacentPion = jeu->plateau[(coord->y)*jeu->taille + coord->x - 1 ];
 		if(adjacentPion->couleur != VIDE && adjacentPion->couleur != jeu->joueurCourant)
 		{
-			printf("Check de la chaine : ");
-			print(adjacentPion->chaineLie);
+			//printf("Check de la chaine : ");
+			//print(adjacentPion->chaineLie);
 			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
-			printf("il y a %d degré de liberté \n", nbDegre);
+			//printf("il y a %d degré de liberté \n", nbDegre);
 			if(nbDegre == 0)
 			{
 				//Capture
@@ -518,10 +509,10 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 		adjacentPion = jeu->plateau[(coord->y)*jeu->taille + coord->x + 1];
 		if(adjacentPion->couleur != VIDE && adjacentPion->couleur != jeu->joueurCourant)
 		{
-			printf("Check de la chaine : ");
-			print(adjacentPion->chaineLie);
+			//printf("Check de la chaine : ");
+			//print(adjacentPion->chaineLie);
 			int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
-			printf("il y a %d degré de liberté \n", nbDegre);
+			//printf("il y a %d degré de liberté \n", nbDegre);
 			if(nbDegre == 0)
 			{
 				//Capture
@@ -666,7 +657,7 @@ void playMooveIA(Jeu * jeu)
 		 return;
 	 }
 	}
-	printf("L'IA joue en x:%d y:%d\n",rdmCoord->x, rdmCoord->y );
+	//printf("L'IA joue en x:%d y:%d\n",rdmCoord->x, rdmCoord->y );
 	playMoove(jeu, rdmCoord, jeu->joueurCourant);
 
 }
@@ -727,10 +718,10 @@ void game(int argc, char *argv[])
 	//si on doit charger une partie existante
 	if(loadPreviousGame)
 	{
-		printf("Starting load function \n");
+		//printf("Starting load function \n");
 		//filename = saveGame.sgf;
 		loadPartyData(fileName, &jeu, &deroulementPartie);
-		printf("Fin chargement, taille : %d\n", jeu->taille);
+		//printf("Fin chargement, taille : %d\n", jeu->taille);
 
 	}
 	else
