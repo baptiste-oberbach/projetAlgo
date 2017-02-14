@@ -14,7 +14,7 @@ void mouse_clicked(int bouton, int x, int y);
 void key_pressed(KeySym code, char c, int x_souris, int y_souris);
 // Initialise une structure jeu
 Jeu * initJeu(int taille);
-DeroulementPartie* initDeroulementPartie(void);
+DeroulementPartie* initDeroulementPartie(Jeu * jeu);
 //Initialise un Pion
 Pion * initPion(Couleur couleur);
 Coord * initCoord(int x, int y);

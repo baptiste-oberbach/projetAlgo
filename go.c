@@ -195,7 +195,7 @@ void mouse_clicked(int bouton, int x, int y)
 
 void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 {
-	
+
 	switch(c)
 	{
 		case 'S':
@@ -204,7 +204,7 @@ void key_pressed(KeySym code, char c, int x_souris, int y_souris)
 			break;
 
 	}
-	
+
 }
 // Initialise une structure jeu
 Jeu * initJeu(int taille)
@@ -232,7 +232,7 @@ Jeu * initJeu(int taille)
 	return jeu;
 }
 
-DeroulementPartie* initDeroulementPartie()
+DeroulementPartie* initDeroulementPartie(Jeu * jeu)
 {
 	DeroulementPartie* deroulementPartie = malloc(sizeof(DeroulementPartie));
 	printf("Apres malloc ?\n");
@@ -251,7 +251,7 @@ DeroulementPartie* initDeroulementPartie()
 	deroulementPartie->result = "";
 	printf("deroulementPartie->result %s\n", deroulementPartie->result);
 	deroulementPartie->isFinish = false;
-	printf("deroulementPartie->isFinish %s\n", deroulementPartie->isFinish);
+	printf("deroulementPartie->isFinish %d\n", deroulementPartie->isFinish);
 
 	return deroulementPartie;
 }
@@ -664,11 +664,11 @@ void game(int argc, char *argv[])
 	}
 	else
 	{
-		
+
 		jeu = initJeu(taillePlateau);
-		deroulementPartie = initDeroulementPartie();
-  	
+		deroulementPartie = initDeroulementPartie(jeu);
+
 	}
 	event_loop();
-	
+
 }

@@ -5,6 +5,7 @@
 #include <string.h>
 #include "listeChainee.h"
 #include "sgfSaveHelper.h"
+#include "go.h"
 
 //Espece de regex maison pour récuperer des infos du fichier
 //buffer : liste du fichier
@@ -25,9 +26,9 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 		//cherche a savoir la longueur de la prochaine chaine qu'il nous faut
 		int position = buffer - indice; //get la position
 		int substringLength = buf_len - position; //prends la longeur de notre substring
-		char* subString = malloc(substringLength*sizeof(char*)); 
-		//Par exemple ici on aura SZ[12345]BLALBLABLALBLABA 
-		strncpy (subString, indice, substringLength); 
+		char* subString = malloc(substringLength*sizeof(char*));
+		//Par exemple ici on aura SZ[12345]BLALBLABLALBLABA
+		strncpy (subString, indice, substringLength);
 
 		//ici subString vaut SZ[19]te
 		printf("substring = %s\n", subString);
@@ -45,14 +46,14 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 
 			printf("searchingPart %s\n", searchingPart);
 			//ici searchingPart vaut SZ[19
-			//On veut la chaine de caractere entre les delimiters, du coup on a plus 
+			//On veut la chaine de caractere entre les delimiters, du coup on a plus
 			//qu'a pousser notre pointeur d'autant de caractere que compose le startDemiliter (pour l'exemple ici ca sera 3)
 			int sizeToPush = strlen(startDelimiter);
 			printf("Len de startDelimiter : %d\n", sizeToPush);
-			int positionPushed = searchingPart - (searchingPart+sizeToPush); 
+			int positionPushed = searchingPart - (searchingPart+sizeToPush);
 			printf("position pushed %d\n", positionPushed);
 			printf("substringLength %d\n", substringLength);
-			int finalResultLength = substringLength + positionPushed; 
+			int finalResultLength = substringLength + positionPushed;
 			printf("finalResultLength %d\n", finalResultLength);
 
 			finalResult = malloc(finalResultLength*sizeof(char*));
@@ -64,14 +65,14 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 			//ici avec notre exemple on aura finalResult = "19"
 			printf("finalResult %s", finalResult);
 		}
-	
+
 	}
 
 	return finalResult;
 }
 
 //sert a load les données du fichier pour reprendre une partie
-void loadPartyData(char* fileName, Jeu* jeu, DeroulementPartie* deroulementPartie)
+void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPartie)
 {
 
 	printf("Try to open save file : %s\n", fileName);
@@ -108,21 +109,21 @@ void loadPartyData(char* fileName, Jeu* jeu, DeroulementPartie* deroulementParti
 	        	printf("final size : %s\n", size);
 	        	if(size != NULL)
 	        	{
-	        		jeu = initJeu(atoi(size));
-	        		printf("jeu : taille %d\n", jeu->taille);
+	        		*jeu = initJeu(atoi(size));
+	        		printf("jeu : taille %d\n", (*jeu)->taille);
 	        		printf("Start to initialize the party\n");
-					deroulementPartie = initDeroulementPartie();
-					printf("apres deroulement party\n");
-					break;
+							*deroulementPartie = initDeroulementPartie(*jeu);
+							printf("apres deroulement party\n");
+							break;
 	        	}
-	        	
+
 	        }
         	//sinon on recherche les autres valeurs dont on a besoin dans le fichier
-	        
-	        
-	        
-	        
-	        
+
+
+
+
+
 
 	    }
 	    printf("Avant free input ?\n");
@@ -133,7 +134,7 @@ void loadPartyData(char* fileName, Jeu* jeu, DeroulementPartie* deroulementParti
 			jeu = initJeu(SZ);
 			deroulementPartie = initDeroulementPartie();*/
 
-		
+
 		/*
 		//parcours tous notre fichier et joue chaque coup
 		Coord * coord = initCoord(posX,posY);
@@ -203,13 +204,13 @@ void writePartyData(char* fileName, DeroulementPartie* deroulementPartie)
 					writeBlackMoove(fp, noeudCourrantNoir->pion->coord->x, noeudCourrantNoir->pion->coord->y);
 					noeudCourrantNoir = noeudCourrantNoir->next;
 				}
-				
+
 				if(noeudCourrantBlanc != NULL)
 				{
 					writeWhiteMoove(fp, noeudCourrantBlanc->pion->coord->x, noeudCourrantBlanc->pion->coord->y);
 					noeudCourrantBlanc = noeudCourrantBlanc->next;
 				}
-				
+
 			}
 			free(noeudCourrantNoir);
 			free(noeudCourrantBlanc);
@@ -219,7 +220,7 @@ void writePartyData(char* fileName, DeroulementPartie* deroulementPartie)
 		writeEndFile(fp);
 
 		printf("Votre partie a bien été sauvegardée !\n");
-		
+
 	}
 	fclose(fp);
 
@@ -230,25 +231,25 @@ void writeFileBeginning(FILE* fp)
 	fputs("(;\n", fp);
 }
 
-// FF: File format: version of SGF specification governing this SGF file. 
+// FF: File format: version of SGF specification governing this SGF file.
 void writeFileFormat(FILE* fp)
 {
 	fputs("FF[4]", fp);
 }
 
-//Write the encoding like example file, but it's not in the official  
+//Write the encoding like example file, but it's not in the official
 void writeEncoding(FILE* fp)
 {
 	fputs("CA[UTF-8]", fp);
 }
 
-//GM: Game: type of game represented by this SGF file. A property value of 1 refers to Go. 
+//GM: Game: type of game represented by this SGF file. A property value of 1 refers to Go.
 void writeGameType(FILE* fp)
 {
 	fputs("GM[1]", fp);
 }
 
-//SZ: Size: size of the board, non square boards are supported. 
+//SZ: Size: size of the board, non square boards are supported.
 void writeBoardSize(FILE* fp, int taillePlateau)
 {
 	switch(taillePlateau)
@@ -269,13 +270,13 @@ void writeBoardSize(FILE* fp, int taillePlateau)
 
 }
 
-// EV: Event: name of the event (e.g. 58th Honinbo Title Match). 
+// EV: Event: name of the event (e.g. 58th Honinbo Title Match).
 void writeEventName(FILE* fp)
 {
 	fputs("EV[Awesome local party]\n", fp);
 }
 
-//RO: Round: round (e.g.: 5th game). 
+//RO: Round: round (e.g.: 5th game).
 void writeRound(FILE* fp, int number)
 {
 	fputs("RO[", fp);
@@ -284,7 +285,7 @@ void writeRound(FILE* fp, int number)
 
 }
 
-//DT: Date: date of the game. 
+//DT: Date: date of the game.
 void writeDateOfTheGame(FILE* fp)
 {
     time_t rawtime;
@@ -301,7 +302,7 @@ void writeDateOfTheGame(FILE* fp)
 	fputs("]\n", fp);
 }
 
-//PB: Black Name: name of the black player. 
+//PB: Black Name: name of the black player.
 void writeBlackPlayerName(FILE* fp, char* name)
 {
 	fputs("PB[", fp);
@@ -309,7 +310,7 @@ void writeBlackPlayerName(FILE* fp, char* name)
     fputs("]\n", fp);
 }
 
-//PW: White Name: name of the white player. 
+//PW: White Name: name of the white player.
 void writeWhitePlayerName(FILE* fp, char* name)
 {
 	fputs("PW[", fp);
@@ -317,7 +318,7 @@ void writeWhitePlayerName(FILE* fp, char* name)
     fputs("]\n", fp);
 }
 
-//RU: Rules: ruleset (e.g.: Japanese). 
+//RU: Rules: ruleset (e.g.: Japanese).
 void writeRule(FILE* fp)
 {
 	fputs("RU[Japanese]\n", fp);
@@ -330,7 +331,7 @@ void writeKomi(FILE* fp)
 	fputs("KM[6.5]\n", fp);
 }
 
-//RE: Result: result, usually in the format "B+R" (Black wins by resign) or "B+3.5" (black wins by 3.5 moku). 
+//RE: Result: result, usually in the format "B+R" (Black wins by resign) or "B+3.5" (black wins by 3.5 moku).
 void writeResult(FILE* fp, char* resultStr)
 {
 	fputs("RE[", fp);
@@ -338,14 +339,14 @@ void writeResult(FILE* fp, char* resultStr)
     fputs("]\n", fp);
 }
 
-//US: User: name of the person who created the SGF file. 
+//US: User: name of the person who created the SGF file.
 void writeWriterName(FILE* fp)
 {
 	fputs("US[System]\n", fp);
 }
 
 //For writing moove, we store value in letter so we add coord to ascii 'a' value to have the correct letter
-//B: a move by Black at the location specified by the property value. 
+//B: a move by Black at the location specified by the property value.
 void writeBlackMoove(FILE* fp, int xCoord, int yCoord)
 {
 	char xLetterCoord = 'a';
@@ -361,7 +362,7 @@ void writeBlackMoove(FILE* fp, int xCoord, int yCoord)
 
 }
 
-// W: a move by White at the location specified by the property value. 
+// W: a move by White at the location specified by the property value.
 void writeWhiteMoove(FILE* fp, int xCoord, int yCoord)
 {
 	char xLetterCoord = 'a';
