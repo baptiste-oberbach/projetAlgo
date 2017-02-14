@@ -651,6 +651,11 @@ void game(int argc, char *argv[])
 			loadPreviousGame = true;
 			fileName = argv[i+1];
 		}
+		// Si l'argument est -largeur
+		if(strcmp(argv[i],"-taille") == 0)
+		{
+			taillePlateau = atoi(argv[i+1]);
+		}
 	}
 
 	init_win(largeur,hauteur, "Jeu de GO",246,254,185);
