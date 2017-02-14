@@ -140,16 +140,17 @@ void mouse_clicked(int bouton, int x, int y)
 			if(isAuthorizedMoove(jeu, *coord))
 			{
 				playMoove(jeu,coord,jeu->joueurCourant);
+				//Fais jouer l'ia
+				if(ia)
+				{
+					playMooveIA(jeu);
+				}
 			}
 			else
 			{
 				free(coord);
 			}
-			draw_win();
-			if(ia)
-			{
-				playMooveIA(jeu);
-			}
+
 			draw_win();
 		}
 		//Si clique droit
@@ -310,7 +311,7 @@ bool isAuthorizedSense(Jeu * jeu, Pion * adjacentPion)
 	{
 		int nbDegre = nbDegreLiberteChaine(jeu,*(adjacentPion->chaineLie));
 		printf("la chaine à %d degré de liberté\n", nbDegre);
-		if(nbDegre < 2)
+		if(nbDegre < 1)
 		{
 			return true;
 		}
@@ -385,11 +386,13 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 		adjacentPion = jeu->plateau[(futurMoove.y)*jeu->taille + futurMoove.x+1];
 		if(isAuthorizedSense(jeu, adjacentPion))
 		{
+			printf("couleur joueur %d, couleur adjacent %d\n", jeu->joueurCourant, adjacentPion->couleur);
 			jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
 			return true;
 		}
 	}
 	jeu->plateau[futurMoove.y*jeu->taille +futurMoove.x]->couleur = VIDE;
+	printf("Pas auth \n");
 	return false;
 }
 
@@ -637,6 +640,7 @@ void afficheScore(Jeu * jeu)
 
 void playMooveIA(Jeu * jeu)
 {
+	srand(time(NULL));
 	Coord * rdmCoord = randomCoord();
 	int i = 0;
 	//Recherche un coup aléatoire jouable
@@ -647,10 +651,12 @@ void playMooveIA(Jeu * jeu)
 	 //Si on ne trouve pas de coup au bout de 10 tentatives
 	 if(i>10)
 	 {
-		 break;
+		 printf("L'IA passe son tour");
 		 passe(jeu);
+		 return;
 	 }
 	}
+	printf("L'IA joue en x:%d y:%d\n",rdmCoord->x, rdmCoord->y );
 	playMoove(jeu, rdmCoord, jeu->joueurCourant);
 
 }
@@ -658,7 +664,6 @@ void playMooveIA(Jeu * jeu)
 //Renvoie un couple de coordonnée random
 Coord * randomCoord()
 {
-	srand(time(NULL));
 	int x = rand() % jeu->taille;
 	//Le random se base sur time, on doit donc attendre pour avoir un nombre différent
 	//sleep(1);
