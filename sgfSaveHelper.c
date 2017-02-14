@@ -26,7 +26,7 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 		//cherche a savoir la longueur de la prochaine chaine qu'il nous faut
 		int position = buffer - indice; //get la position
 		int substringLength = buf_len - position; //prends la longeur de notre substring
-		char* subString = malloc(substringLength*sizeof(char*));
+		char* subString = malloc(substringLength*sizeof(char));
 		//Par exemple ici on aura SZ[12345]BLALBLABLALBLABA
 		strncpy (subString, indice, substringLength);
 
@@ -41,7 +41,8 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 			char* pointeurToTheEndOfSubstring = subString + substringLength;
 			int positionEnd = pointeurToTheEndOfSubstring - indiceEndDemiliter;
 			int searchingPartLength = substringLength - positionEnd;
-			char* searchingPart = malloc(searchingPartLength*sizeof(char*));
+			printf("searchingPartLength %d\n",searchingPartLength);
+			char* searchingPart = malloc(searchingPartLength*sizeof(char));
 			strncpy (searchingPart, subString, searchingPartLength);
 
 			printf("searchingPart %s\n", searchingPart);
@@ -56,7 +57,7 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 			int finalResultLength = substringLength + positionPushed;
 			printf("finalResultLength %d\n", finalResultLength);
 
-			finalResult = malloc(finalResultLength*sizeof(char*));
+			finalResult = malloc(finalResultLength*sizeof(char));
 			//du coup on va pouvoir enfin avoir notre resultat (youhou)
 			printf("Le malloc est fait\n");
 
@@ -85,7 +86,7 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 		//traitement du fichier, on va chercher les mots clés
 		int sz = 0;
 
-		char buffer[10];
+		char buffer[256];
 	    char *input = 0;
 	    size_t cur_len = 0;
 
@@ -109,8 +110,11 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 	        	printf("final size : %s\n", size);
 	        	if(size != NULL)
 	        	{
-	        		*jeu = initJeu(atoi(size));
+							int sizeInt = atoi(size);
+							printf("sizeInt %d \n", sizeInt);
+	        		*jeu = initJeu(sizeInt);
 	        		printf("jeu : taille %d\n", (*jeu)->taille);
+							printf("jeu : joeuurCourant %d, \n",(*jeu)->joueurCourant);
 	        		printf("Start to initialize the party\n");
 							*deroulementPartie = initDeroulementPartie(*jeu);
 							printf("apres deroulement party\n");

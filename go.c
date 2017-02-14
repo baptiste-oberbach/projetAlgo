@@ -24,46 +24,46 @@ void draw_win()
 	// vide la fenetre
 	clear_win();
 	// Calcul des unités
-	int uniteHauteur = height_win()/(taillePlateau+1);
-	int uniteLargeur = width_win()/(taillePlateau+1);
+	int uniteHauteur = height_win()/(jeu->taille+1);
+	int uniteLargeur = width_win()/(jeu->taille+1);
 
 	int i,j;
 	//Choix de la couleur noir
 	color(0.0,0.0,0.0);
 	//traçage des lignes
-	for(i=0; i<taillePlateau; i++)
+	for(i=0; i<jeu->taille; i++)
 	{
     	line(uniteLargeur,(i+1)*uniteHauteur,width_win()-uniteLargeur,(i+1)*uniteHauteur);
 	}
 	//traçage des colonnes
-	for(j=0; j<taillePlateau; j++)
+	for(j=0; j<jeu->taille; j++)
 	{
 		line((j+1)*uniteLargeur,uniteHauteur,(j+1)*uniteLargeur,height_win()-uniteHauteur);
 	}
 
   	//traçage des hoshis
-	switch(taillePlateau)
+	switch(jeu->taille)
 	{
 		case 19:
-			for(i=3; i<taillePlateau; i+=6)
+			for(i=3; i<jeu->taille; i+=6)
 			{
-				for(j=3; j<taillePlateau; j+=6)
+				for(j=3; j<jeu->taille; j+=6)
 					filled_circle((i+1)*uniteLargeur,(j+1)*uniteHauteur,5);
 			}
 			break;
 		case 13:
-			for(i=3; i<taillePlateau; i+=6)
+			for(i=3; i<jeu->taille; i+=6)
 			{
-				for(j=3; j<taillePlateau; j+=6)
+				for(j=3; j<jeu->taille; j+=6)
 					filled_circle((i+1)*uniteHauteur,(j+1)*uniteLargeur,5);
 			}
 			//hoshi central
 			filled_circle(7*uniteHauteur,7*uniteLargeur,5);
 			break;
 		case 9:
-			for(i=2; i<taillePlateau; i+=4)
+			for(i=2; i<jeu->taille; i+=4)
 			{
-				for(j=2; j<taillePlateau; j+=4)
+				for(j=2; j<jeu->taille; j+=4)
 					filled_circle((i+1)*uniteHauteur,(j+1)*uniteLargeur,5);
 			}
 			//hoshi central
@@ -73,15 +73,16 @@ void draw_win()
 
 	//Dessin des pions
 	//Pour chaque croisement
-	for(int i = 0;i < taillePlateau; i++)
+	for(int i = 0;i < jeu->taille; i++)
 	{
-		for(int j = 0; j < taillePlateau; j++)
+		for(int j = 0; j < jeu->taille; j++)
 		{
+			printf("i %d * taillePlateau %d + j %d\n", i, jeu->taille, j);
 			//Si il existe un pion sur ce croisement
-			if(jeu->plateau[i*taillePlateau+j]->couleur != VIDE)
+			if(jeu->plateau[i*jeu->taille+j]->couleur != VIDE)
 			{
 				//Choix de la couleur
-				if(jeu->plateau[i*taillePlateau+j]->couleur == BLANC)
+				if(jeu->plateau[i*jeu->taille+j]->couleur == BLANC)
 				{
 					color(1.0,1.0,1.0);
 				}
@@ -118,8 +119,8 @@ void mouse_clicked(int bouton, int x, int y)
 		//Si clique gauche
 		if(bouton == 1)
 		{
-			double uniteHauteur = height_win()/(taillePlateau+1);
-			double uniteLargeur = width_win()/(taillePlateau+1);
+			double uniteHauteur = height_win()/(jeu->taille+1);
+			double uniteLargeur = width_win()/(jeu->taille+1);
 
 			double dX = x/uniteLargeur;
 			double dY = y/uniteHauteur;
@@ -666,6 +667,8 @@ void game(int argc, char *argv[])
 		printf("Starting load function \n");
 		//filename = saveGame.sgf;
 		loadPartyData(fileName, &jeu, &deroulementPartie);
+		printf("Fin chargement, taille : %d\n", jeu->taille);
+
 	}
 	else
 	{
