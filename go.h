@@ -34,6 +34,9 @@ void fusionneChaineVoisine(Jeu * jeu,Pion * pion);
 void saveGame(void);
 void finirPartie(Jeu * jeu);
 void afficheScore(Jeu * jeu);
+void playMooveIA(Jeu * jeu);
+void passe(Jeu * jeu);
+Coord * randomCoord(void);
 //Lance le jeux
 void game(int argc, char *argv[]);
 

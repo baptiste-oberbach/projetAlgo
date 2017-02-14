@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <time.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include "go.h"
 #include "listeChainee.h"
 #include "dessine.h"
@@ -10,7 +12,9 @@
 
 
 
+
 int taillePlateau = 19;
+bool ia = false;
 Jeu * jeu;
 DeroulementPartie* deroulementPartie;
 
@@ -77,7 +81,6 @@ void draw_win()
 	{
 		for(int j = 0; j < jeu->taille; j++)
 		{
-			printf("i %d * taillePlateau %d + j %d\n", i, jeu->taille, j);
 			//Si il existe un pion sur ce croisement
 			if(jeu->plateau[i*jeu->taille+j]->couleur != VIDE)
 			{
@@ -114,8 +117,6 @@ void mouse_clicked(int bouton, int x, int y)
 		}
 
 	}else{
-
-
 		//Si clique gauche
 		if(bouton == 1)
 		{
@@ -139,49 +140,22 @@ void mouse_clicked(int bouton, int x, int y)
 			if(isAuthorizedMoove(jeu, *coord))
 			{
 				playMoove(jeu,coord,jeu->joueurCourant);
-				if(jeu->joueurCourant == BLANC)
-				{
-					jeu->lastCoordBlanc = coord;
-					jeu->joueurCourant = NOIR;
-				}
-				else
-				{
-					jeu->lastCoordNoir = coord;
-					jeu->joueurCourant = BLANC;
-				}
 			}
 			else
 			{
 				free(coord);
 			}
 			draw_win();
+			if(ia)
+			{
+				playMooveIA(jeu);
+			}
+			draw_win();
 		}
 		//Si clique droit
 		if(bouton == 3)
 		{
-			// Si les deux joueurs ont passé l'un après l'autre
-			if((jeu->joueurCourant == BLANC && jeu->lastCoordNoir->x == -1) || (jeu->joueurCourant == NOIR && jeu->lastCoordBlanc->x == -1))
-			{
-				printf("Deux passage consécutif, fin du jeux \n");
-				//Pour nous, le jeu est terminé, passe cette variable a true pour que les prochains cliques soient gérer différements (pour qu'on puisse enlever les pions conflictuelles du plateau)
-				jeu->isFinish = true;
-				finirPartie(jeu);
-			}
-			else
-			{
-				//Le joueur Blanc passe
-				if(jeu->joueurCourant == BLANC)
-				{
-					jeu->joueurCourant = NOIR;
-					jeu->lastCoordBlanc = initCoord(-1,-1);
-				}
-				//Le joueur Noir passe
-				else
-				{
-					jeu->joueurCourant = BLANC;
-					jeu->lastCoordNoir = initCoord(-1,-1);
-				}
-			}
+			passe(jeu);
 		}
 	}
 }
@@ -419,6 +393,33 @@ bool isAuthorizedMoove(Jeu * jeu, Coord futurMoove)
 	return false;
 }
 
+void passe(Jeu * jeu)
+{
+	// Si les deux joueurs ont passé l'un après l'autre
+	if((jeu->joueurCourant == BLANC && jeu->lastCoordNoir->x == -1) || (jeu->joueurCourant == NOIR && jeu->lastCoordBlanc->x == -1))
+	{
+		printf("Deux passage consécutif, fin du jeux \n");
+		//Pour nous, le jeu est terminé, passe cette variable a true pour que les prochains cliques soient gérer différements (pour qu'on puisse enlever les pions conflictuelles du plateau)
+		jeu->isFinish = true;
+		finirPartie(jeu);
+	}
+	else
+	{
+		//Le joueur Blanc passe
+		if(jeu->joueurCourant == BLANC)
+		{
+			jeu->joueurCourant = NOIR;
+			jeu->lastCoordBlanc = initCoord(-1,-1);
+		}
+		//Le joueur Noir passe
+		else
+		{
+			jeu->joueurCourant = BLANC;
+			jeu->lastCoordNoir = initCoord(-1,-1);
+		}
+	}
+}
+
 void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 {
 	Pion * pion = initPion(couleur);
@@ -514,6 +515,16 @@ void playMoove(Jeu * jeu, Coord * coord, Couleur couleur)
 				enleverChaine(jeu,adjacentPion->chaineLie);
 			}
 		}
+	}
+	if(jeu->joueurCourant == BLANC)
+	{
+		jeu->lastCoordBlanc = coord;
+		jeu->joueurCourant = NOIR;
+	}
+	else
+	{
+		jeu->lastCoordNoir = coord;
+		jeu->joueurCourant = BLANC;
 	}
 }
 
@@ -624,6 +635,36 @@ void afficheScore(Jeu * jeu)
 	}
 }
 
+void playMooveIA(Jeu * jeu)
+{
+	Coord * rdmCoord = randomCoord();
+	int i = 0;
+	//Recherche un coup aléatoire jouable
+	while(!isAuthorizedMoove(jeu,*rdmCoord))
+	{
+	 rdmCoord = randomCoord();
+	 i++;
+	 //Si on ne trouve pas de coup au bout de 10 tentatives
+	 if(i>10)
+	 {
+		 break;
+		 passe(jeu);
+	 }
+	}
+	playMoove(jeu, rdmCoord, jeu->joueurCourant);
+
+}
+
+//Renvoie un couple de coordonnée random
+Coord * randomCoord()
+{
+	srand(time(NULL));
+	int x = rand() % jeu->taille;
+	//Le random se base sur time, on doit donc attendre pour avoir un nombre différent
+	//sleep(1);
+	int y = rand() % jeu->taille;
+	return initCoord(x,y);
+}
 
 //Lance le jeu
 void game(int argc, char *argv[])
@@ -652,10 +693,17 @@ void game(int argc, char *argv[])
 			loadPreviousGame = true;
 			fileName = argv[i+1];
 		}
-		// Si l'argument est -largeur
+		//
 		if(strcmp(argv[i],"-taille") == 0)
 		{
 			taillePlateau = atoi(argv[i+1]);
+		}
+		//
+		if(strcmp(argv[i],"-ia") == 0)
+		{
+			ia = true;
+			//l'argument -ia est le seul argument sans paramètre, or on lie des couples de paramètre, on doit donc décrémenter i
+			i--;
 		}
 	}
 
@@ -672,11 +720,10 @@ void game(int argc, char *argv[])
 	}
 	else
 	{
-
 		jeu = initJeu(taillePlateau);
 		deroulementPartie = initDeroulementPartie(jeu);
-
 	}
+
 	event_loop();
 
 }
