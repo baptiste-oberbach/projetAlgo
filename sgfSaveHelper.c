@@ -31,7 +31,7 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 		strncpy (subString, indice, substringLength);
 
 		//ici subString vaut SZ[19]te
-		printf("substring = %s\n", subString);
+		//printf("substring = %s\n", subString);
 
 		char* indiceEndDemiliter;
 		indiceEndDemiliter = strstr(subString, endDelimiter);
@@ -41,11 +41,11 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 			char* pointeurToTheEndOfSubstring = subString + substringLength;
 			int positionEnd = pointeurToTheEndOfSubstring - indiceEndDemiliter;
 			int searchingPartLength = substringLength - positionEnd;
-			printf("searchingPartLength %d\n",searchingPartLength);
+			//printf("searchingPartLength %d\n",searchingPartLength);
 			char* searchingPart = malloc(searchingPartLength*sizeof(char));
 			strncpy (searchingPart, subString, searchingPartLength);
 
-			printf("searchingPart %s\n", searchingPart);
+			//printf("searchingPart %s\n", searchingPart);
 			//ici searchingPart vaut SZ[19
 			//On veut la chaine de caractere entre les delimiters, du coup on a plus
 			//qu'a pousser notre pointeur d'autant de caractere que compose le startDemiliter (pour l'exemple ici ca sera 3)
@@ -70,7 +70,7 @@ char* searchValueInBuffer(char* buffer, size_t buf_len, char* startDelimiter, ch
 void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPartie)
 {
 
-	printf("Try to open save file : %s\n", fileName);
+	//printf("Try to open save file : %s\n", fileName);
 	FILE *fp = fopen(fileName, "r");
 	if(fp == NULL) {
 		perror("Error opening file.");
@@ -173,14 +173,14 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 						//buffer-positionOfSubstring car positionOfSubstring est négatif
 						strncpy(partyOfCurrentLine, buffer-positionOfSubstring, tailleDuSubString);
 
-						printf("partyOfCurrentLine %s\n", partyOfCurrentLine);
+						//printf("partyOfCurrentLine %s\n", partyOfCurrentLine);
 
-						printf("Joueur courant : %d\n", (*jeu)->joueurCourant);
+						//printf("Joueur courant : %d\n", (*jeu)->joueurCourant);
 	        		 	if((*jeu)->joueurCourant == NOIR){
 	        		 		if(partyOfCurrentLine[0] == 'W')
 		        			{
 		        				//le joueur a passé son tour
-		        				printf("Le joueur noir passe son tour\n");
+		        				//printf("Le joueur noir passe son tour\n");
 		        				passe(*jeu);
 		        				i--;
 		        			}
@@ -190,9 +190,9 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 		        				if(tour != NULL)
 		        				{
 		        					//si on est ici c'est que l'on a trouvé une ligne parlant de coup a jouer, et qu'on a vu une partie noir
-		        					printf("tour NOIR  %s\n", tour);
-		        					printf("x : %d\n", tour[0]-'a');
-		        					printf("y : %d\n", tour[1]-'a');
+		        					//printf("tour NOIR  %s\n", tour);
+		        					//printf("x : %d\n", tour[0]-'a');
+		        					//printf("y : %d\n", tour[1]-'a');
 		        					int x = tour[0] - 'a';
 		        					int y = tour[1] - 'a';
 		        					Coord* coord = initCoord(x ,y);
@@ -206,13 +206,13 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 		        			
 		        		}else if((*jeu)->joueurCourant == BLANC)//sinon il est blanc
 		        		{
-		        			printf("TOUR BLANC \n");
+		        			//printf("TOUR BLANC \n");
 
 		        			//check si le joueur a pas passé son tour
 		        			if(partyOfCurrentLine[0] == 'B')
 		        			{
 		        				//le joueur a passé son tour
-		        				printf("Le joueur blanc passe son tour\n");
+		        				//printf("Le joueur blanc passe son tour\n");
 		        				passe(*jeu);
 		        				i--;
 		        			}
@@ -222,9 +222,9 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 		        				tour = searchValueInBuffer(partyOfCurrentLine, tailleDuSubString, "W[", "]");
 			        			if(tour != NULL)
 			        			{
-			        				printf("tour BLANC  %s\n", tour);
-		        					printf("x : %d\n", tour[0]-'a');
-		        					printf("y : %d\n", tour[1]-'a');
+			        				//printf("tour BLANC  %s\n", tour);
+		        					//printf("x : %d\n", tour[0]-'a');
+		        					//printf("y : %d\n", tour[1]-'a');
 			        				int x = tour[0] - 'a';
 		        					int y = tour[1] - 'a';
 		        					Coord* coord = initCoord(x ,y);
@@ -249,7 +249,7 @@ void loadPartyData(char* fileName, Jeu** jeu, DeroulementPartie** deroulementPar
 void writePartyData(char* fileName, DeroulementPartie* deroulementPartie)
 {
 
-	printf("Try to create file : %s\n", fileName);
+	//printf("Try to create file : %s\n", fileName);
 	//ab : Append; open or create file for writing at end-of-file.
 	FILE *fp = fopen(fileName, "w");
 
@@ -258,7 +258,7 @@ void writePartyData(char* fileName, DeroulementPartie* deroulementPartie)
 	}
 	else
 	{
-		printf("Try to write file\n");
+		//printf("Try to write file\n");
 		//write all informations step by step in file
 		//start file
 		writeFileBeginning(fp);
@@ -437,7 +437,7 @@ void writeWriterName(FILE* fp)
 //B: a move by Black at the location specified by the property value.
 void writeBlackMoove(FILE* fp, int xCoord, int yCoord)
 {
-	printf("Write blackmoove : x : %d, y : %d\n", xCoord, yCoord);
+	//printf("Write blackmoove : x : %d, y : %d\n", xCoord, yCoord);
 	char xLetterCoord = 'a';
 	char yLetterCoord = 'a';
 
@@ -454,7 +454,7 @@ void writeBlackMoove(FILE* fp, int xCoord, int yCoord)
 // W: a move by White at the location specified by the property value.
 void writeWhiteMoove(FILE* fp, int xCoord, int yCoord)
 {
-	printf("Write whitemoove : x : %d, y : %d\n", xCoord, yCoord);
+	//printf("Write whitemoove : x : %d, y : %d\n", xCoord, yCoord);
 
 	char xLetterCoord = 'a';
 	char yLetterCoord = 'a';

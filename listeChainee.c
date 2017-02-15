@@ -246,16 +246,16 @@ void removeAllChaine(Liste* chaine1)
 //Merge la chaine1 avec la chaine2
 void mergeChaine(Liste* chaine1, Liste* chaine2)
 {
-	printf("merge chaine \n");
+	//printf("merge chaine \n");
 	if(chaine1->first == NULL) //la premiere chaine est vide
 		return;
 	if(chaine2->first == NULL)
 		return;
-	print(chaine1);
-	print(chaine2);
+	//print(chaine1);
+	//print(chaine2);
 	if(chaine1 == chaine2)
 	{
-		printf("Les chaines sont identiques \n");
+		//printf("Les chaines sont identiques \n");
 			return;
 	}
 	chaine1->last->next = chaine2->first; //met a la suite pour lui enfiler l'autre chaine
