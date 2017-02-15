@@ -157,8 +157,11 @@ void mouse_clicked(int bouton, int x, int y)
 		if(bouton == 3)
 		{
 			passe(jeu);
-			playMooveIA(jeu);
-			draw_win();
+			if(ia)
+			{
+				playMooveIA(jeu);
+				draw_win();
+			}
 		}
 	}
 }
